@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Identity;
 using ShopSportShoes.Repositories.Interfaces;
 using ShopSportShoes.Repositories;
 using ShopSportShoes.Models;
+using MudBlazor.Services;
 
 namespace ShopSportShoes
 {
@@ -50,13 +51,13 @@ namespace ShopSportShoes
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-            services.AddAntDesign();
 
             // Set 
             services.AddDbContextFactory<ShoeShopDbContext>(options => options.UseOracle(Configuration.GetConnectionString("DEV"), 
                 options => options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
             // Add services
+            services.AddMudServices();
 
             services.AddSingleton<BaseRepository<User>, UserRepository>();
 
