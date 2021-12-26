@@ -12,8 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Components\" />
-    <Folder Include="Features\HomePage\Components\" />
+    <Folder Include="Features\ProductDetail\" />
     <Folder Include="Services\" />
     <Folder Include="wwwroot\js\" />
   </ItemGroup>

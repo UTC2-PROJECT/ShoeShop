@@ -1,0 +1,29 @@
+﻿
+<style>
+    .product-item__img {
+        width: 100%;
+        object-fit: contain;
+        transition: 0.3s;
+    }
+
+        .product-item__img:hover {
+            transform: scale(1.1);
+        }
+</style>
+
+<MudItem xs="3" Style="cursor:pointer;" @onclick="HandleOnClickItem">
+    <div style="width:100%; overflow:hidden">
+        <img class="product-item__img" src="./images/shoes/1.jpg" />
+    </div>
+    <p class="my-2">NIKE MERCURIAL ZOOM VAPOR 14 PRO TF - CV1001-760 - VÀNG NEON</p>
+    <span class="mud-primary-text font-weight-bold">2.600.000đ</span>
+</MudItem>
+
+@code {
+    [Parameter] public Shoe Shoe { get; set; }
+
+    void HandleOnClickItem()
+    {
+
+    }
+}
