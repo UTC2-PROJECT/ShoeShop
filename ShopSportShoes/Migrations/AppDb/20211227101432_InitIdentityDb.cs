@@ -155,12 +155,12 @@ namespace ShopSportShoes.Migrations.AppDb
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "6678261f-54bc-4cdc-afe8-60652ddcea7f", "5034c4b7-f6a9-41ec-8586-a77ac331906d", "User", "USER" });
+                values: new object[] { "214a248e-5048-4e09-ae45-be3251966fc6", "ded1c676-a7a0-40af-b7a2-515a4fdad7a2", "User", "USER" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "4e09d979-8871-48e1-bb23-a58829cf2849", "893c43c7-eedb-4f39-b7b8-0e9fc434f7b9", "Admin", "ADMIN" });
+                values: new object[] { "87165092-545d-4a4a-a993-62fe036f1f77", "62f449a7-7793-47d3-892f-deea018b2a00", "Admin", "ADMIN" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

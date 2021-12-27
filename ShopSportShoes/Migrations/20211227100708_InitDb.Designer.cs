@@ -10,8 +10,8 @@ using ShopSportShoes.Data;
 namespace ShopSportShoes.Migrations
 {
     [DbContext(typeof(ShoeShopDbContext))]
-    [Migration("20211223170143_UpdateDb")]
-    partial class UpdateDb
+    [Migration("20211227100708_InitDb")]
+    partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,24 +20,6 @@ namespace ShopSportShoes.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.13")
                 .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("ShopSportShoes.Models.Account", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("NUMBER(10)")
-                        .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Password")
-                        .HasColumnType("NVARCHAR2(2000)");
-
-                    b.Property<string>("Username")
-                        .HasColumnType("NVARCHAR2(2000)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Accounts");
-                });
 
             modelBuilder.Entity("ShopSportShoes.Models.Evolution", b =>
                 {
@@ -67,7 +49,7 @@ namespace ShopSportShoes.Migrations
                     b.ToTable("Evolutions");
                 });
 
-            modelBuilder.Entity("ShopSportShoes.Models.ImageSource", b =>
+            modelBuilder.Entity("ShopSportShoes.Models.Image", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -77,14 +59,14 @@ namespace ShopSportShoes.Migrations
                     b.Property<string>("Path")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<int?>("ShoeId")
+                    b.Property<int>("ShoeId")
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ShoeId");
 
-                    b.ToTable("ImageSource");
+                    b.ToTable("Image");
                 });
 
             modelBuilder.Entity("ShopSportShoes.Models.Order", b =>
@@ -182,22 +164,32 @@ namespace ShopSportShoes.Migrations
 
             modelBuilder.Entity("ShopSportShoes.Models.ShoeSize", b =>
                 {
+                    b.Property<int>("ShoeId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.Property<int>("SizeId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.HasKey("ShoeId", "SizeId");
+
+                    b.HasIndex("SizeId");
+
+                    b.ToTable("ShoeSize");
+                });
+
+            modelBuilder.Entity("ShopSportShoes.Models.Size", b =>
+                {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NUMBER(10)")
                         .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("ShoeId")
-                        .HasColumnType("NUMBER(10)");
 
                     b.Property<string>("SizeName")
                         .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ShoeId");
-
-                    b.ToTable("ShoeSize");
+                    b.ToTable("Size");
                 });
 
             modelBuilder.Entity("ShopSportShoes.Models.User", b =>
@@ -206,9 +198,6 @@ namespace ShopSportShoes.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NUMBER(10)")
                         .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("NUMBER(10)");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("TIMESTAMP(7)");
@@ -223,9 +212,6 @@ namespace ShopSportShoes.Migrations
                         .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId")
-                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -249,11 +235,15 @@ namespace ShopSportShoes.Migrations
                     b.Navigation("UserNavigation");
                 });
 
-            modelBuilder.Entity("ShopSportShoes.Models.ImageSource", b =>
+            modelBuilder.Entity("ShopSportShoes.Models.Image", b =>
                 {
-                    b.HasOne("ShopSportShoes.Models.Shoe", null)
-                        .WithMany("ImageSources")
-                        .HasForeignKey("ShoeId");
+                    b.HasOne("ShopSportShoes.Models.Shoe", "ShoeNavigation")
+                        .WithMany("ImagesNavigation")
+                        .HasForeignKey("ShoeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ShoeNavigation");
                 });
 
             modelBuilder.Entity("ShopSportShoes.Models.Order", b =>
@@ -291,37 +281,38 @@ namespace ShopSportShoes.Migrations
 
             modelBuilder.Entity("ShopSportShoes.Models.ShoeSize", b =>
                 {
-                    b.HasOne("ShopSportShoes.Models.Shoe", null)
-                        .WithMany("Sizes")
-                        .HasForeignKey("ShoeId");
-                });
-
-            modelBuilder.Entity("ShopSportShoes.Models.User", b =>
-                {
-                    b.HasOne("ShopSportShoes.Models.Account", "AccountNavigation")
-                        .WithOne("UserNavigation")
-                        .HasForeignKey("ShopSportShoes.Models.User", "AccountId")
+                    b.HasOne("ShopSportShoes.Models.Shoe", "ShoeNavigation")
+                        .WithMany("ShoeSizesNavigation")
+                        .HasForeignKey("ShoeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AccountNavigation");
-                });
+                    b.HasOne("ShopSportShoes.Models.Size", "SizeNavigation")
+                        .WithMany("ShoeSizesNavigation")
+                        .HasForeignKey("SizeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("ShopSportShoes.Models.Account", b =>
-                {
-                    b.Navigation("UserNavigation");
+                    b.Navigation("ShoeNavigation");
+
+                    b.Navigation("SizeNavigation");
                 });
 
             modelBuilder.Entity("ShopSportShoes.Models.Shoe", b =>
                 {
-                    b.Navigation("ImageSources");
+                    b.Navigation("ImagesNavigation");
 
-                    b.Navigation("Sizes");
+                    b.Navigation("ShoeSizesNavigation");
                 });
 
             modelBuilder.Entity("ShopSportShoes.Models.ShoeCatalog", b =>
                 {
                     b.Navigation("ShoesNavigation");
+                });
+
+            modelBuilder.Entity("ShopSportShoes.Models.Size", b =>
+                {
+                    b.Navigation("ShoeSizesNavigation");
                 });
 
             modelBuilder.Entity("ShopSportShoes.Models.User", b =>

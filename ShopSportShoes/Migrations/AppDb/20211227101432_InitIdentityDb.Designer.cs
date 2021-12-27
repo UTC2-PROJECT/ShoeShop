@@ -10,8 +10,8 @@ using ShopSportShoes.Areas.Identity.Data;
 namespace ShopSportShoes.Migrations.AppDb
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20211225155351_InitIdentityDb2")]
-    partial class InitIdentityDb2
+    [Migration("20211227101432_InitIdentityDb")]
+    partial class InitIdentityDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,15 +50,15 @@ namespace ShopSportShoes.Migrations.AppDb
                     b.HasData(
                         new
                         {
-                            Id = "7d6da58e-c68f-4799-8102-158516e5e984",
-                            ConcurrencyStamp = "203cd139-1f06-4c4e-b1a5-f21519a5c7fb",
+                            Id = "214a248e-5048-4e09-ae45-be3251966fc6",
+                            ConcurrencyStamp = "ded1c676-a7a0-40af-b7a2-515a4fdad7a2",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "0e3a22dd-82c9-424c-9bf5-ca8f53b7b7df",
-                            ConcurrencyStamp = "213e5b29-4019-445a-bc61-764adef2c293",
+                            Id = "87165092-545d-4a4a-a993-62fe036f1f77",
+                            ConcurrencyStamp = "62f449a7-7793-47d3-892f-deea018b2a00",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -86,6 +86,71 @@ namespace ShopSportShoes.Migrations.AppDb
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("NVARCHAR2(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("NVARCHAR2(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("NUMBER(1)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("NUMBER(1)");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("TIMESTAMP(7) WITH TIME ZONE");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("NVARCHAR2(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("NVARCHAR2(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("NUMBER(1)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("NUMBER(1)");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("NVARCHAR2(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("\"NormalizedUserName\" IS NOT NULL");
+
+                    b.ToTable("AspNetUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -168,71 +233,6 @@ namespace ShopSportShoes.Migrations.AppDb
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("ShopSportShoes.Models.Identity.AppUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("NVARCHAR2(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("NUMBER(10)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("NVARCHAR2(2000)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("NVARCHAR2(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("NUMBER(1)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("NUMBER(1)");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("TIMESTAMP(7) WITH TIME ZONE");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("NVARCHAR2(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("NVARCHAR2(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("NVARCHAR2(2000)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("NVARCHAR2(2000)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("NUMBER(1)");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("NVARCHAR2(2000)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("NUMBER(1)");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("NVARCHAR2(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("\"NormalizedUserName\" IS NOT NULL");
-
-                    b.ToTable("AspNetUsers");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -244,7 +244,7 @@ namespace ShopSportShoes.Migrations.AppDb
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("ShopSportShoes.Models.Identity.AppUser", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -253,7 +253,7 @@ namespace ShopSportShoes.Migrations.AppDb
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("ShopSportShoes.Models.Identity.AppUser", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -268,7 +268,7 @@ namespace ShopSportShoes.Migrations.AppDb
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ShopSportShoes.Models.Identity.AppUser", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -277,7 +277,7 @@ namespace ShopSportShoes.Migrations.AppDb
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("ShopSportShoes.Models.Identity.AppUser", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

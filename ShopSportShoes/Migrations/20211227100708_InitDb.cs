@@ -8,20 +8,6 @@ namespace ShopSportShoes.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Accounts",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    Username = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    Password = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Accounts", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ShoeCatalogs",
                 columns: table => new
                 {
@@ -35,6 +21,19 @@ namespace ShopSportShoes.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Size",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
+                    SizeName = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Size", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -43,18 +42,11 @@ namespace ShopSportShoes.Migrations
                     Name = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     Email = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    IsAdmin = table.Column<bool>(type: "NUMBER(1)", nullable: false),
-                    AccountId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                    IsAdmin = table.Column<bool>(type: "NUMBER(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_Accounts_AccountId",
-                        column: x => x.AccountId,
-                        principalTable: "Accounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -131,6 +123,26 @@ namespace ShopSportShoes.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Image",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
+                    Path = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    ShoeId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Image", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Image_Shoes_ShoeId",
+                        column: x => x.ShoeId,
+                        principalTable: "Shoes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderDetails",
                 columns: table => new
                 {
@@ -151,6 +163,30 @@ namespace ShopSportShoes.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ShoeSize",
+                columns: table => new
+                {
+                    ShoeId = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    SizeId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ShoeSize", x => new { x.ShoeId, x.SizeId });
+                    table.ForeignKey(
+                        name: "FK_ShoeSize_Shoes_ShoeId",
+                        column: x => x.ShoeId,
+                        principalTable: "Shoes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ShoeSize_Size_SizeId",
+                        column: x => x.SizeId,
+                        principalTable: "Size",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Evolutions_ShoeId",
                 table: "Evolutions",
@@ -160,6 +196,11 @@ namespace ShopSportShoes.Migrations
                 name: "IX_Evolutions_UserId",
                 table: "Evolutions",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Image_ShoeId",
+                table: "Image",
+                column: "ShoeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderDetails_ShoeId",
@@ -177,10 +218,9 @@ namespace ShopSportShoes.Migrations
                 column: "ShoeCatalogId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_AccountId",
-                table: "Users",
-                column: "AccountId",
-                unique: true);
+                name: "IX_ShoeSize_SizeId",
+                table: "ShoeSize",
+                column: "SizeId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -189,22 +229,28 @@ namespace ShopSportShoes.Migrations
                 name: "Evolutions");
 
             migrationBuilder.DropTable(
+                name: "Image");
+
+            migrationBuilder.DropTable(
                 name: "OrderDetails");
 
             migrationBuilder.DropTable(
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Shoes");
+                name: "ShoeSize");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "ShoeCatalogs");
+                name: "Shoes");
 
             migrationBuilder.DropTable(
-                name: "Accounts");
+                name: "Size");
+
+            migrationBuilder.DropTable(
+                name: "ShoeCatalogs");
         }
     }
 }
