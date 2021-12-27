@@ -30,10 +30,10 @@ namespace ShopSportShoes.Areas
                 services.Configure<IdentityOptions>(options =>
                 {
                     // Thiết lập về Password
-                    options.Password.RequireDigit = true; // Không bắt phải có số
+                    options.Password.RequireDigit = false; // Không bắt phải có số
                     options.Password.RequireLowercase = false; // Không bắt phải có chữ thường
                     options.Password.RequireNonAlphanumeric = false; // Không bắt ký tự đặc biệt
-                    options.Password.RequireUppercase = true; // Không bắt buộc chữ in
+                    options.Password.RequireUppercase = false; // Không bắt buộc chữ in
                     //options.Password.RequiredLength = 3; // Số ký tự tối thiểu của password
                     //options.Password.RequiredUniqueChars = 1; // Số ký tự riêng biệt
 
@@ -43,12 +43,12 @@ namespace ShopSportShoes.Areas
                     options.Lockout.AllowedForNewUsers = true;
 
                     // Cấu hình về User.
-                    options.User.AllowedUserNameCharacters = // các ký tự đặt tên user
-                        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                   
+                    options.User.AllowedUserNameCharacters = String.Empty; // Set String.Empty để nhập tên với ký tự bất kỳ
                     options.User.RequireUniqueEmail = true;  // Email là duy nhất
 
                     // Cấu hình đăng nhập.
-                    options.SignIn.RequireConfirmedEmail = true;            // Cấu hình xác thực địa chỉ email (email phải tồn tại)
+                    options.SignIn.RequireConfirmedEmail = false;            // Cấu hình xác thực địa chỉ email (email phải tồn tại)
                     options.SignIn.RequireConfirmedPhoneNumber = false;     // Xác thực số điện thoại
 
                 });

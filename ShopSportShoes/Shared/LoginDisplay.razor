@@ -1,11 +1,28 @@
-<AuthorizeView >
+﻿<AuthorizeView >
     <Authorized>
         Hello, @context.User.Identity.Name!
-        <form method="post" action="Identity/Account/LogOut">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
-        </form>
+        <MudLink Href="Identity/Account/Logout" Underline="Underline.None" Class="mx-3">Đăng xuất</MudLink>
+        <MudBadge Content="100" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
+            <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
+        </MudBadge>
     </Authorized>
     <NotAuthorized>
-        <a href="Identity/Account/Login">Log in</a>
+        <MudMenu OffsetY="true" Direction="Direction.Bottom">
+            <ActivatorContent>
+                <MudIcon Icon="@Icons.Outlined.SupervisedUserCircle" Style="font-size:2rem"
+                         Color="Color.Dark" />
+            </ActivatorContent>
+            <ChildContent>
+                <MudMenuItem>
+                    <MudLink Href="Identity/Account/Login" Underline="Underline.None">Đăng nhập</MudLink>
+                </MudMenuItem>
+                <MudMenuItem>
+                    <MudLink Href="Identity/Account/Register" Underline="Underline.None">Đăng ký</MudLink>
+                </MudMenuItem>
+            </ChildContent>
+        </MudMenu>
+        <MudBadge Content="100" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
+            <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
+        </MudBadge>
     </NotAuthorized>
 </AuthorizeView>

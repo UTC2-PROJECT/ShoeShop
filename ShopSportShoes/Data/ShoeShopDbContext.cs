@@ -10,7 +10,6 @@ namespace ShopSportShoes.Data
     public class ShoeShopDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
-        public DbSet<Account> Accounts { get; set; }
         public DbSet<Shoe> Shoes { get; set; }
         public DbSet<ShoeCatalog> ShoeCatalogs { get; set; }
         public DbSet<Order> Orders { get; set; }

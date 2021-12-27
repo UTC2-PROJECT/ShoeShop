@@ -1,12 +1,27 @@
 ﻿
-<div style="display:flex; align-items:center; justify-content:space-between;">
-    <div style="width:300px; height:60px; background:red;">
 
-    </div>
-    <Search></Search>
-    <LoginDisplay /> <!-- Add this -->
-</div>
+<MudGrid Style="align-items:center">
+    <MudItem xs="3">
+        <img src="./images/logos/logo.jpg" style="object-fit: contain; width: 100%; padding: 20px 50px;"/>
+    </MudItem>
+    <MudItem xs="6">
+        <MudAutocomplete T="string" Placeholder="Tìm kiếm sản phẩm của bạn..." SearchFunc="ContentAutoSearch" Variant="Variant.Outlined"
+                         AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                         Margin="Margin.Dense"
+                         Dense="true">
+        </MudAutocomplete>
+
+    </MudItem>
+    <MudItem xs="3">
+        <div style="display:flex; justify-content:center; align-items:center;">
+            <LoginDisplay />
+        </div>
+    </MudItem>
+</MudGrid>
 
 @code {
-
+    private Task<IEnumerable<string>> ContentAutoSearch(string value)
+    {
+        return null;
+    }
 }

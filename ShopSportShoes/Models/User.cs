@@ -12,10 +12,7 @@ namespace ShopSportShoes.Models
         public string Email { get; set; }
         public DateTime DateOfBirth { get; set; }
         public bool IsAdmin { get; set; }
-        public int AccountId { get; set; }
-        public Account AccountNavigation { get; set; }
         public List<Order> OrdersNavigation { get; set; }
         public List<Evolution> EvolutionsNavigation { get; set; }
-
     }
 }
