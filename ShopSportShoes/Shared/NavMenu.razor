@@ -1,0 +1,59 @@
+﻿<style>
+    .menu-item {
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+        color: #333;
+    }
+
+        .menu-item:hover {
+            color: #b90b0b;
+        }
+
+    .active-item {
+        color: #b90b0b;
+        border-bottom: 1px solid red;
+    }
+</style>
+<MudContainer>
+    <div class="d-flex" id="menu" style="height:50px;">
+        @foreach (var item in _listTitle.Keys)
+        {
+            <MudLink Href="@item" Underline="Underline.None" >
+                <div class="menu-item d-flex align-items-center justify-content-center mx-3 pa-2 @(_itemSelected == _listTitle[item] ? "active-item":"")" @onclick="@(() => _itemSelected = _listTitle[item])">
+                    @_listTitle[item]
+                </div>
+            </MudLink>
+        }
+
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MudLink Href="/admin" Underline="Underline.None">
+                    <div class="menu-item d-flex align-items-center justify-content-center mx-3 pa-2 @(_itemSelected == "Admin" ? "active-item":"")" @onclick="@(() => _itemSelected = "Admin")">
+                        Admin
+                    </div>
+                </MudLink>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+</MudContainer>
+
+@code{
+
+
+    //List<string> _listTitle = new() { "Trang chủ", "Tất cả sản phẩm", "Giày cỏ nhân tạo", "Giày Futsal", "Giày trẻ em", "Admin" };
+    Dictionary<string, string> _listTitle = new();
+
+    string _itemSelected = "Trang chủ";
+
+    protected override void OnInitialized()
+    {
+        _listTitle.Add("/","Trang chủ");
+        _listTitle.Add("/tatca-sanpham","Tất cả sản phẩm");
+        _listTitle.Add("/danhmuc/giay-conhantao","Giày cỏ nhân tạo");
+        _listTitle.Add("/danhmuc/giay-futsal", "Giày Futsal");
+        _listTitle.Add("/danhmuc/giay-treem","Giày trẻ em");
+
+        base.OnInitialized();
+    }
+}
