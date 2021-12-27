@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ShopSportShoes.Areas.Identity.Data
 {
-    public class AppDbContext : IdentityDbContext<AppUser>
+    public class AppDbContext : IdentityDbContext<IdentityUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 

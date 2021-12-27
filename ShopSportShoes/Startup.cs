@@ -24,6 +24,7 @@ using ShopSportShoes.Repositories.Interfaces;
 using ShopSportShoes.Repositories;
 using ShopSportShoes.Models;
 using MudBlazor.Services;
+using ShopSportShoes.Services;
 
 namespace ShopSportShoes
 {
@@ -59,7 +60,9 @@ namespace ShopSportShoes
             // Add services
             services.AddMudServices();
 
-            services.AddSingleton<BaseRepository<User>, UserRepository>();
+            services.AddScoped<IBaseRepository<User>, UserRepository>();
+
+            services.AddSingleton<GoogleDriveService>();
 
         }
 

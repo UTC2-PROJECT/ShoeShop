@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <Folder Include="Features\ProductDetail\" />
-    <Folder Include="Services\" />
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
@@ -28,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.55.0.2502" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
