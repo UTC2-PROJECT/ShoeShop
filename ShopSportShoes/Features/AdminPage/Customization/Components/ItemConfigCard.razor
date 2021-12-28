@@ -1,0 +1,104 @@
+﻿@inject IBaseRepository<ShopSportShoes.Models.Size> SizeRepository
+@inject ISnackbar Snackbar
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <div class="d-flex align-items-center">
+                <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" Label="Thêm size" @bind-Value="_textSize" />
+                <MudTooltip Text="Thêm">
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="AddSize" />
+                </MudTooltip>
+            </div>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <div style="height:200px; overflow-y:scroll;">
+            @foreach (var item in _sizes)
+            {
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    @if (_isEdit && _textSeleted == item.Id)
+                    {
+                        <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="item.SizeName" />
+                    }
+                    else
+                    {
+                        <span style="font-size:18px;" class="ml-2">@item.SizeName</span>
+                    }
+                    <div class="d-flex align-items-center">
+                        @if (_isEdit && _textSeleted == item.Id)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Check" Color="Color.Warning"
+                                           Class="mx-1" Size="MudBlazor.Size.Small"
+                                           OnClick="() => UpdateSize(item)" />
+                        }
+                        else
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Warning"
+                                           Class="mx-1" Size="MudBlazor.Size.Small"
+                                           OnClick="() => HandleEditClick(item)" />
+                        }
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
+                                       Class="mx-1" Size="MudBlazor.Size.Small"
+                                       OnClick="() => DeleteSize(item)" />
+                    </div>
+                </div>
+            }
+        </div>
+    </MudCardContent>
+</MudCard>
+@code {
+    List<ShopSportShoes.Models.Size> _sizes = new();
+
+    string _textSize;
+    int _textSeleted;
+    bool _isEdit;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _sizes = await SizeRepository.GetAllAsync();
+    }
+    async Task UpdateSize(ShopSportShoes.Models.Size size)
+    {
+        await SizeRepository.UpdateAsync(size);
+        _textSeleted = 0;
+        _isEdit = false;
+    }
+
+    void HandleEditClick(ShopSportShoes.Models.Size size)
+    {
+        _textSeleted = size.Id;
+        _isEdit = true;
+    }
+
+    async Task DeleteSize(ShopSportShoes.Models.Size size)
+    {
+        await SizeRepository.DeleteAsync(size.Id);
+        _sizes.Remove(size);
+    }
+
+    bool CheckContainItem(string size)
+    {
+        return _sizes.Any(x => x.SizeName == size);
+    }
+
+    async Task AddSize()
+    {
+        if (!string.IsNullOrEmpty(_textSize))
+        {
+            if (CheckContainItem(_textSize))
+            {
+                Snackbar.Add("Size đã có rồi", Severity.Info);
+                return;
+            }
+            ShopSportShoes.Models.Size size = new() { SizeName = _textSize };
+            await SizeRepository.AddAsync(size);
+            _sizes.Add(size);
+            _textSize = null;
+        }
+        else
+        {
+            Snackbar.Add("Thông tin không được trống", Severity.Info);
+        }
+    }
+}

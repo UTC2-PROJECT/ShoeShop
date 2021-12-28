@@ -8,6 +8,11 @@ namespace ShopSportShoes.Models
 {
     public class Shoe
     {
+        public Shoe()
+        {
+            ShoeSizesNavigation = new();
+            ImagesNavigation = new();
+        }
         public int Id { get; set; }
         public string Title { get; set; }
         public double Price { get; set; }
@@ -15,8 +20,8 @@ namespace ShopSportShoes.Models
        
         public int ShoeCatalogId { get; set; }
         public ShoeCatalog ShoeCatalogNavigation { get; set; }
-        public IList<ShoeSize> ShoeSizesNavigation { get; set; }
-        public IList<Image> ImagesNavigation { get; set; }
+        public List<ShoeSize> ShoeSizesNavigation { get; set; }
+        public List<Image> ImagesNavigation { get; set; }
     }
 
     public class Size
@@ -37,7 +42,8 @@ namespace ShopSportShoes.Models
     public class Image
     {
         public int Id { get; set; }
-        public string Path { get; set; }
+        public string ImageName { get; set; }
+        public byte[] ImageSource { get; set; }
         public int ShoeId { get; set; }
         public Shoe ShoeNavigation { get; set; }
     }

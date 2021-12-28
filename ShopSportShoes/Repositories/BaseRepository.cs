@@ -19,12 +19,13 @@ namespace ShopSportShoes.Repositories
                 throw new ArgumentNullException(nameof(context));
             _dbset = _contextFactory.CreateDbContext().Set<T>();
         }
-        public async Task AddAsync(T entity)
+        public async Task<T> AddAsync(T entity)
         {
             var context = _contextFactory.CreateDbContext();
             _dbset = context.Set<T>();
-            _dbset.Add(entity);
+            var data = _dbset.Add(entity);
             await context.SaveChangesAsync();
+            return data.Entity;
         }
 
         public async Task DeleteAsync(int id)
@@ -36,7 +37,7 @@ namespace ShopSportShoes.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task<IList<T>> GetAllAsync()
+        public async Task<List<T>> GetAllAsync()
         {
             var context = _contextFactory.CreateDbContext();
             _dbset = context.Set<T>();
@@ -50,7 +51,7 @@ namespace ShopSportShoes.Repositories
             return await _dbset.FindAsync(id);
         }
 
-        public async Task<IList<T>> GetFilterAsync(Expression<Func<T, bool>> filter)
+        public async Task<List<T>> GetFilterAsync(Expression<Func<T, bool>> filter)
         {
             var context = _contextFactory.CreateDbContext();
             _dbset = context.Set<T>();

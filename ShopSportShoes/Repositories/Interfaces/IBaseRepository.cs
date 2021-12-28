@@ -8,10 +8,10 @@ namespace ShopSportShoes.Repositories.Interfaces
 {
     public interface IBaseRepository<T> where T : class
     {
-        Task<IList<T>> GetAllAsync();
-        Task<IList<T>> GetFilterAsync(Expression<Func<T, bool>> filter);
+        Task<List<T>> GetAllAsync();
+        Task<List<T>> GetFilterAsync(Expression<Func<T, bool>> filter);
         Task<T> GetByIdAsync(int id);
-        Task AddAsync(T entity);
+        Task<T> AddAsync(T entity);
         Task UpdateAsync(T entity);
         Task DeleteAsync(int id);
     }

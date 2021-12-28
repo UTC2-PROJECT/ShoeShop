@@ -1,13 +1,15 @@
 ﻿@page "/admin"
+@attribute [Authorize(Roles = "Admin")]
 @inject GoogleDriveService DriveService
+@inject NavigationManager NavigationManager
 
-<h3>Admin</h3>
-<MudFileUploader/>
-<MudButton OnClick="HandleOnClick">Click</MudButton>
+@using ShopSportShoes.Features.AdminPage.Components
 
 @code {
-    void HandleOnClick()
+
+    protected override void OnInitialized()
     {
-        DriveService.UploadFIle("h1.png");
+        NavigationManager.NavigateTo("/admin/product-management");
+        base.OnInitialized();
     }
 }

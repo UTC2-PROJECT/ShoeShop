@@ -2,9 +2,12 @@
     <Authorized>
         Hello, @context.User.Identity.Name!
         <MudLink Href="Identity/Account/Logout" Underline="Underline.None" Class="mx-3">Đăng xuất</MudLink>
-        <MudBadge Content="100" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
-            <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
-        </MudBadge>
+        @if (!LockCart)
+        {
+            <MudBadge Content="100" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
+                <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
+            </MudBadge>
+        }
     </Authorized>
     <NotAuthorized>
         <MudMenu OffsetY="true" Direction="Direction.Bottom">
@@ -21,8 +24,15 @@
                 </MudMenuItem>
             </ChildContent>
         </MudMenu>
-        <MudBadge Content="100" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
-            <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
-        </MudBadge>
+        @if (!LockCart)
+        {
+            <MudBadge Content="100" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
+                <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
+            </MudBadge>
+        }
     </NotAuthorized>
 </AuthorizeView>
+
+@code{
+    [Parameter] public bool LockCart { get; set; }
+}

@@ -1,0 +1,110 @@
+﻿@page "/admin/product-management"
+
+@inject IBaseRepository<Shoe> ShoeRepository
+@inject IBaseRepository<ShoeCatalog> ShoeCatalogRepository
+@inject IBaseRepository<ShopSportShoes.Models.Size> SizeRepository
+@inject IDialogService DialogService
+
+@using ShopSportShoes.Features.AdminPage.ProductManagement.Components
+
+<MudTable ServerData="@(new Func<TableState, Task<TableData<Shoe>>>(ServerReload))"
+          Dense="true" Hover="true" @ref="_shoetable" Virtualize="true"
+          Height="70vh" FixedFooter="true" FixedHeader="true">
+    <ToolBarContent>
+        <MudButton OnClick="HandleAddProduct" Color="Color.Primary" Variant="Variant.Outlined">Thêm sản phẩm</MudButton>
+        <MudSpacer />
+        <MudSpacer />
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Tìm kiếm" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="title_field" T="Shoe">Tiêu đề</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="description_field" T="Shoe">Mô tả</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="images_field" T="Shoe">Hình ảnh</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="sizes_field" T="Shoe">Size</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Title">@context.Title</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="Images">@context?.ImagesNavigation</MudTd>
+        <MudTd DataLabel="Sizes">@(string.Join(", ", context.ShoeSizesNavigation.Select(x => x.SizeNavigation.SizeName)))</MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>Không có gì</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Đang load...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    List<Shoe> _shoes = new();
+    List<ShoeCatalog> _shoeCatalogs = new();
+    List<ShopSportShoes.Models.Size> _sizes = new();
+    IEnumerable<Shoe> _pagedData;
+
+    MudTable<Shoe> _shoetable;
+
+    string _searchString;
+    int _totalItems;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _shoes = await ShoeRepository.GetAllAsync();
+        _sizes = await SizeRepository.GetAllAsync();
+        _shoeCatalogs = await ShoeCatalogRepository.GetAllAsync();
+    }
+
+    async Task<TableData<Shoe>> ServerReload(TableState state)
+    {
+        await Task.Delay(300);
+
+        var data = _shoes.Where(element =>
+        {
+            if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+            if (element.Title.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (element.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if ($"{element.Title} {element.Description} {element.Price.ToString()}".Contains(_searchString))
+                return true;
+            return false;
+        }).ToList();
+
+        _totalItems = data.Count();
+
+        switch (state.SortLabel)
+        {
+            case "title_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Title).ToList();
+                break;
+            case "description_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Description).ToList();
+                break;
+        }
+
+        _pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<Shoe>() { TotalItems = _totalItems, Items = _pagedData };
+    }
+
+    void OnSearch(string text)
+    {
+        _searchString = text;
+        _shoetable.ReloadServerData();
+    }
+
+    void HandleAddProduct()
+    {
+        DialogOptions options = new() { DisableBackdropClick = true };
+        DialogParameters parameters = new();
+        parameters.Add("Sizes", _sizes);
+        parameters.Add("Catalogs", _shoeCatalogs);
+
+        DialogService.Show<SaveProductModal>("", parameters, options);
+    }
+}
