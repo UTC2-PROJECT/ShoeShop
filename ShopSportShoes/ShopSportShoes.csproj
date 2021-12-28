@@ -6,14 +6,17 @@
 
   <ItemGroup>
     <Compile Remove="Auth0\**" />
+    <Compile Remove="Features\ProductDetail\**" />
+    <Compile Remove="wwwroot\js\**" />
     <Content Remove="Auth0\**" />
+    <Content Remove="Features\ProductDetail\**" />
+    <Content Remove="wwwroot\js\**" />
     <EmbeddedResource Remove="Auth0\**" />
+    <EmbeddedResource Remove="Features\ProductDetail\**" />
+    <EmbeddedResource Remove="wwwroot\js\**" />
     <None Remove="Auth0\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\ProductDetail\" />
-    <Folder Include="wwwroot\js\" />
+    <None Remove="Features\ProductDetail\**" />
+    <None Remove="wwwroot\js\**" />
   </ItemGroup>
 
   <ItemGroup>
