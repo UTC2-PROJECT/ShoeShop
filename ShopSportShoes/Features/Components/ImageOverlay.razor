@@ -1,0 +1,28 @@
+﻿<MudOverlay DarkBackground="true" Visible="IsOpen" ZIndex="9999">
+    <MudPaper Class="pa-2">
+        @if (ImageSource != null)
+        {
+            <img src="@ImageSource" loading="lazy" style="max-width:90vw; max-height:90vh; object-fit:contain;" alt="Ảnh phóng to" />
+        }
+        <MudIconButton Icon="@Icons.Material.Filled.Close"
+                       Style="position: absolute; top: -.75rem; right: -.75rem; background-color: #fff"
+                       Size="@MudBlazor.Size.Small"
+                       OnClick="HandleCancel"></MudIconButton>
+    </MudPaper>
+</MudOverlay>
+
+@code {
+    [Parameter] public string ImageSource { get; set; }
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public EventCallback<string> ImageSourceChanged { get; set; }
+
+    void HandleCancel()
+    {
+        IsOpen = false;
+        ImageSource = null;
+        IsOpenChanged.InvokeAsync(IsOpen);
+        ImageSourceChanged.InvokeAsync(ImageSource);
+    }
+
+}

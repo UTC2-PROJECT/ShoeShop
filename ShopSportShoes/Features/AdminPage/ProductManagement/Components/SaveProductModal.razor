@@ -1,77 +1,134 @@
-﻿@inject IBaseRepository<Image> ImageRepository
-@inject IBaseRepository<Shoe> ShoeRepository
-@inject IBaseRepository<ShoeSize> ShoeSizeRepository
+﻿@inject ImageRepository ImageRepository
+@inject ShoeRepository ShoeRepository
+@inject ShoeSizeRepository ShoeSizeRepository
+@inject GoogleDriveService GoogleDriveService
+@inject ISnackbar Snackbar
 
 @using System.IO;
+@using Blazored.FluentValidation
 
 <MudDialog>
     <DialogContent>
-        <MudGrid>
-            <MudItem xs="6">
-                <MudTextField Label="Tiêu đề" T="string" Variant="Variant.Outlined" Margin="Margin.Dense"
-                              @bind-Value="_shoe.Title" />
-            </MudItem>
-            <MudItem xs="6">
-                <MudSelect T="ShoeCatalog" Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense"
-                           OffsetY="true" Label="Loại giày" Clearable="true" @bind-Value="_shoeCatalog" Text="@_shoeCatalog.Name">
-                    @foreach (var item in Catalogs)
-                    {
-                        <MudSelectItem Value="@item">@item.Name</MudSelectItem>
-                    }
-                </MudSelect>
-            </MudItem>
-            <MudItem xs="12">
-                <MudTextField Label="Mô tả" T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_shoe.Description" Lines="3" />
-            </MudItem>
-            <MudItem xs="6">
-                <MudSelect T="ShopSportShoes.Models.Size" Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense"
-                           MultiSelection="true" OffsetY="true" Label="Chọn size giày" Clearable="true" Text="@_sizesText"
-                           SelectedValues="_sizesSeleted" SelectedValuesChanged="(e) => _sizesSeleted = e.ToList()">
-                    @foreach (var item in Sizes)
-                    {
-                        <MudSelectItem Value="@item">@item.SizeName</MudSelectItem>
-                    }
-                </MudSelect>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField T="string"
-                              Value="@(_shoe.Price.ToString() ?? "0")"
-                              ValueChanged="@((e) =>_shoe.Price = FormatCurrency(e))"
-                              Label="Giá tiền"
-                              Variant="Variant.Outlined"
-                              Adornment="Adornment.End"
-                              AdornmentText="đ"
-                              Margin="Margin.Dense"
-                              Text="@(string.Format("{0:#,##0}", _shoe.Price))" />
-            </MudItem>
-            <MudItem xs="12">
-                <InputFile id="fileInput" OnChange="FilesChange" hidden multiple />
-                <MudButton HtmlTag="label"
-                           Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           StartIcon="@Icons.Filled.CloudUpload"
-                           for="fileInput">
-                    Upload Files
-                </MudButton>
-                @if (_files.Count > 0)
-                {
-                    <div class="d-flex align-items-center justify-content-start mt-3 flex-wrap">
-                        @foreach (var item in _files)
+        <MudForm Model="Shoe" @ref="_form">
+            <MudGrid>
+                <MudItem xs="6">
+                    <MudTextField Label="Tiêu đề" T="string" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                  @bind-Value="Shoe.Title" Validation="@(ShoeValidation.ValidateValue)"
+                                  For="() => Shoe.Title" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudSelect T="ShoeCatalog" Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense"
+                               OffsetY="true" Label="Loại giày" @bind-Value="Shoe.ShoeCatalogNavigation"
+                               For="() => Shoe.ShoeCatalogNavigation" Validation="@(ShoeValidation.ValidateValue)"
+                               ToStringFunc="(e) => e?.Name">
+                        @foreach (var item in Catalogs)
                         {
-                            <MudCard class="mr-2 mb-2 d-flex align-items-center">
-                                @item.Name
-                                <MudIcon Icon="@Icons.Material.Outlined.Delete" Color="Color.Primary" Style="font-size:20px; cursor:pointer;"
-                                         @onclick="() => _files.Remove(item)" />
-                            </MudCard>
+                            <MudSelectItem Value="@item">@item.Name</MudSelectItem>
                         }
-                    </div>
-                }
-            </MudItem>
-        </MudGrid>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Mô tả" T="string" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                  @bind-Value="Shoe.Description" Lines="3" For="() => Shoe.Description" Validation="@(ShoeValidation.ValidateValue)" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudSelect T="ShopSportShoes.Models.Size" Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense"
+                               MultiSelection="true" OffsetY="true" Label="Chọn size giày" Clearable="true" Text="@_sizesText"
+                               SelectedValues="_sizesSeleted" SelectedValuesChanged="(e) => _sizesSeleted = e.ToList()">
+                        @foreach (var item in Sizes)
+                        {
+                            <MudSelectItem Value="@item">@item.SizeName</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudChipSet AllClosable="true" OnClose="HanledSizeClosed">
+                        @foreach (var value in _sizesSeleted)
+                        {
+                            <MudChip Value="value" Text="@value.SizeName" on></MudChip>
+                        }
+                    </MudChipSet>
+                    @if (_sizesSeleted.Count <= 0)
+                    {
+                        <p class="mt-2" style="color:red">Chưa chọn size giày</p>
+                    }
+                </MudItem>
+                <MudItem xs="6">
+                    <MudTextField T="double"
+                                  @bind-Value="@Shoe.Price"
+                                  Label="Giá tiền"
+                                  Variant="Variant.Outlined"
+                                  Adornment="Adornment.End"
+                                  AdornmentText="đ"
+                                  Margin="Margin.Dense"
+                                  Text="@(string.Format("{0:#,##0}", Shoe.Price))"
+                                  For="() => Shoe.Price" Validation="@(ShoeValidation.ValidateValue)" />
+                </MudItem>
+                <MudItem xs="6">
+                    <MudSelect T="ShoeCatalog" Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense"
+                               OffsetY="true" Label="Loại giày" @bind-Value="Shoe.ShoeCatalogNavigation"
+                               For="() => Shoe.ShoeCatalogNavigation" Validation="@(ShoeValidation.ValidateValue)"
+                               ToStringFunc="(e) => e?.Name">
+                        @foreach (var item in Catalogs)
+                        {
+                            <MudSelectItem Value="@item">@item.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <InputFile id="fileInput" OnChange="FilesChange" hidden multiple />
+                    <MudButton HtmlTag="label"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Filled.CloudUpload"
+                               for="fileInput">
+                        Upload Files
+                    </MudButton>
+                    @if (_newFiles.Count > 0)
+                    {
+                        <div class="d-flex align-items-center justify-content-start mt-3 flex-wrap">
+                            @foreach (var item in _newFiles)
+                            {
+                                <MudCard class="mr-2 mb-2 d-flex align-items-center">
+                                    @item.Name
+                                    <MudIcon Icon="@Icons.Material.Outlined.Delete" Color="Color.Primary" Style="font-size:20px; cursor:pointer;"
+                                             @onclick="() => _newFiles.Remove(item)" />
+                                </MudCard>
+                            }
+                        </div>
+                    }
+                    @if (IsEdit)
+                    {
+                        <div class="d-flex align-items-center flex-wrap">
+                            @foreach (var item in Shoe.ImagesNavigation)
+                            {
+                                <MudCard Style="width:100px; height:100px;" Class="ma-2 d-flex align-items-center">
+                                    <img loading="lazy" src="@item.ThumbnailLink" style="object-fit:contain;width:100%; cursor:pointer;" />
+                                    <MudIcon Icon="@Icons.Material.Outlined.Delete" Color="Color.Primary" Style="font-size:20px; cursor:pointer;"
+                                             @onclick="() => {
+                                                           Shoe.ImagesNavigation.Remove(item);
+                                                           _imageDeleteds.Add(item);
+                                                       }" />
+                                </MudCard>
+                            }
+                        </div>
+                    }
+                    @if (_newFiles.Count <= 0 && Shoe?.ImagesNavigation?.Count <= 0)
+                    {
+                        <p class="mt-2" style="color:red">Chưa có hình</p>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+        <MudOverlay Visible="_isLoading" LightBackground="true" Absolute="true">
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+        </MudOverlay>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Huỷ</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Thêm</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Xong</MudButton>
+        <MudOverlay Visible="_isLoading" LightBackground="true" Absolute="true">
+        </MudOverlay>
     </DialogActions>
 </MudDialog>
 
@@ -79,73 +136,199 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public List<ShopSportShoes.Models.Size> Sizes { get; set; }
     [Parameter] public List<ShoeCatalog> Catalogs { get; set; }
+    [Parameter] public Shoe Shoe { get; set; }
+    [Parameter] public bool IsEdit { get; set; }
 
     List<ShopSportShoes.Models.Size> _sizesSeleted = new();
-    List<IBrowserFile> _files = new();
-    Shoe _shoe = new();
-    ShoeCatalog _shoeCatalog = new();
+    List<ShopSportShoes.Models.Size> _sizeDeleteds = new();
+    List<IBrowserFile> _newFiles = new();
+    List<Image> _imageAddeds = new();
+    List<Image> _imageDeleteds = new();
 
-    string _sizesText => string.Join(", ", _sizesSeleted.Select(x => x.SizeName));
 
-    async Task AddShoe()
+    ShoeCatalog ShoeCatalog = new();
+    MudForm _form;
+    ShoeValidation ShoeValidation = new();
+
+    bool _isLoading;
+
+    string _sizesText => string.Join(", ", _sizesSeleted.Select(x => x?.SizeName));
+
+    protected override void OnInitialized()
     {
-        _shoe.ShoeCatalogId = _shoeCatalog.Id;
-        var shoe = await ShoeRepository.AddAsync(_shoe);
+        if (IsEdit)
+        {
+            _sizesSeleted = Shoe.ShoeSizesNavigation.Select(x => x.SizeNavigation).ToList();
+        }
+    }
+
+    void HanledSizeClosed(MudChip chip)
+    {
+        var size = _sizesSeleted.Find(x => x.SizeName == chip.Text);
+        _sizesSeleted.Remove(size);
+        if (!_sizeDeleteds.Contains(size))
+        {
+            _sizeDeleteds.Add(size);
+        }
+    }
+
+    async Task<Shoe> AddShoe()
+    {
+        Shoe.ShoeCatalogId = Shoe.ShoeCatalogNavigation.Id;
+        Shoe.ShoeCatalogNavigation = null;
+        var shoeAdded = await ShoeRepository.AddAsync(Shoe);
 
         // Add image
-        foreach (var item in _files)
+        List<Task> listTasks = new();
+
+        foreach (var item in _newFiles)
         {
-            await AddImage(item, shoe.Id);
+            listTasks.Add(AddImage(item, shoeAdded.Id));
         }
+
+        await Task.WhenAll(listTasks);
 
         // Add ShoeSize
         foreach (var size in _sizesSeleted)
         {
             await ShoeSizeRepository.AddAsync(new ShoeSize
             {
-                ShoeId = shoe.Id,
+                ShoeId = Shoe.Id,
                 SizeId = size.Id
             });
         }
+
+        Snackbar.Add("Thêm thành công", Severity.Success);
+        return Shoe;
     }
 
     async Task AddImage(IBrowserFile browserFile, int shoeId)
     {
-        var ms = new MemoryStream();
-        await browserFile.OpenReadStream().CopyToAsync(ms);
-        Image image = new()
+        string imageName = $"{DateTime.Now.ToString("dd-MM-yyyyhh-mm-")}{browserFile.Name}";
+        var fileId = await GoogleDriveService.UploadFIleAsync(browserFile, imageName);
+        //string thumbnailLink = $"https://www.googleapis.com/drive/v3/files/{fileId}?alt=media&key=AIzaSyD739-eb6NzS_KbVJq1K8ZAxnrMfkIqPyw";
+        string thumbnailLink = $"https://drive.google.com/thumbnail?authuser=0&sz=w2000&id={fileId}";
+
+        if (string.IsNullOrEmpty(fileId))
         {
-            ImageName = browserFile.Name,
-            ImageSource = ms.ToArray(),
-            ShoeId = shoeId
-        };
-        await ImageRepository.AddAsync(image);
+            Snackbar.Add("Upload ảnh thất bại", Severity.Info);
+        }
+        else
+        {
+            Image image = new()
+            {
+                ImageName = imageName,
+                ThumbnailLink = thumbnailLink,
+                ShoeId = shoeId
+            };
+            var imageAdded = await ImageRepository.AddAsync(image);
+            _imageAddeds.Add(imageAdded);
+        }
     }
 
     void FilesChange(InputFileChangeEventArgs e)
     {
-        foreach (var file in e.GetMultipleFiles())
+        foreach (var file in e.GetMultipleFiles(10))
         {
-            _files.Add(file);
+            _newFiles.Add(file);
         }
-    }
-
-    double FormatCurrency(string value)
-    {
-        double n = 0;
-        if (!double.TryParse(value, out n))
-        {
-            return 0;
-        }
-        if (n < 0)
-            return 0;
-        return n;
     }
 
     async Task Submit()
     {
-        await AddShoe();
-        MudDialog.Close(DialogResult.Ok(true));
+        await _form.Validate();
+        if (_form.IsValid)
+        {
+            Shoe shoe = new();
+            if (IsEdit)
+            {
+                // Update 
+                if (Shoe.ImagesNavigation.Count > 0 && _sizesSeleted.Count > 0)
+                {
+                    _isLoading = true;
+                    shoe = await UpdateShoe();
+                    _isLoading = false;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                // Add
+                if (_newFiles.Count > 0 && _sizesSeleted.Count > 0)
+                {
+                    _isLoading = true;
+                    shoe = await AddShoe();
+                    _isLoading = false;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            MudDialog.Close(DialogResult.Ok(shoe));
+        }
+    }
+
+    async Task<Shoe> UpdateShoe()
+    {
+        // Update images
+        await UpdateImages();
+
+        // Update size
+        await UpdateSizes();
+
+        Shoe.ShoeCatalogId = Shoe.ShoeCatalogNavigation.Id;
+        Shoe.ImagesNavigation = new();
+        Shoe.ShoeSizesNavigation = new();
+        Shoe.ShoeCatalogNavigation = null;
+        var shoeUpdated = await ShoeRepository.UpdateCustomizeAsync(Shoe);
+        return shoeUpdated;
+    }
+
+    async Task UpdateImages()
+    {
+        // Delete images
+        if (_imageDeleteds.Count > 0)
+        {
+            await Task.WhenAll(GoogleDriveService.DeleteRangeAsync(_imageDeleteds.Select(x => x.ImageName).ToList()));
+        }
+        foreach (var item in _imageDeleteds)
+        {
+            await ImageRepository.DeleteAsync(item.Id);
+        }
+
+        // Add new image files
+        List<Task> listTasks = new();
+        if (_newFiles.Count > 0)
+        {
+            foreach (var item in _newFiles)
+            {
+                listTasks.Add(AddImage(item, Shoe.Id));
+            }
+        }
+        await Task.WhenAll(listTasks);
+    }
+
+    async Task UpdateSizes()
+    {
+        // Delete all current sizes
+        var shoeSizes = await ShoeSizeRepository.GetFilterAsync(x => x.ShoeId == Shoe.Id);
+        foreach (var item in shoeSizes)
+        {
+            await ShoeSizeRepository.DeleteAsync(item.Id);
+        }
+
+        // Add new sizes
+        List<ShoeSize> newShoeSizes = _sizesSeleted.Select(x => new ShoeSize
+        {
+            ShoeId = Shoe.Id,
+            SizeId = x.Id
+        }).ToList();
+
+        await ShoeSizeRepository.AddRangeAsync(newShoeSizes);
     }
 
     void Cancel() => MudDialog.Cancel();

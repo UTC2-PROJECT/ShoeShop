@@ -1,11 +1,11 @@
-﻿@inject ShoeCatalogRepository ShoeCatalogRepository
+﻿@inject SizeRepository SizeRepository
 @inject ISnackbar Snackbar
 
 <MudCard>
     <MudCardHeader>
         <CardHeaderContent>
             <div class="d-flex align-items-center">
-                <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" Label="Thêm loại giày" @bind-Value="_textSize" />
+                <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" Label="Thêm size" @bind-Value="_textSize" />
                 <MudTooltip Text="Thêm">
                     <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="AddSize" />
                 </MudTooltip>
@@ -14,16 +14,16 @@
     </MudCardHeader>
     <MudCardContent>
         <div style="height:200px; overflow-y:scroll;">
-            @foreach (var item in _shoeCatalogs)
+            @foreach (var item in _sizes)
             {
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     @if (_isEdit && _textSeleted == item.Id)
                     {
-                        <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="item.Name" />
+                        <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="item.SizeName" />
                     }
                     else
                     {
-                        <span style="font-size:18px;" class="ml-2">@item.Name</span>
+                        <span style="font-size:18px;" class="ml-2">@item.SizeName</span>
                     }
                     <div class="d-flex align-items-center">
                         @if (_isEdit && _textSeleted == item.Id)
@@ -48,7 +48,7 @@
     </MudCardContent>
 </MudCard>
 @code {
-    List<ShoeCatalog> _shoeCatalogs = new();
+    List<ShopSportShoes.Models.Size> _sizes = new();
 
     string _textSize;
     int _textSeleted;
@@ -56,30 +56,30 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _shoeCatalogs = await ShoeCatalogRepository.GetAllAsync();
+        _sizes = await SizeRepository.GetAllAsync();
     }
-    async Task UpdateSize( ShoeCatalog shoeCatalog)
+    async Task UpdateSize(ShopSportShoes.Models.Size size)
     {
-        await ShoeCatalogRepository.UpdateAsync(shoeCatalog);
+        await SizeRepository.UpdateAsync(size);
         _textSeleted = 0;
         _isEdit = false;
     }
 
-    void HandleEditClick(ShoeCatalog shoeCatalog)
+    void HandleEditClick(ShopSportShoes.Models.Size size)
     {
-        _textSeleted = shoeCatalog.Id;
+        _textSeleted = size.Id;
         _isEdit = true;
     }
 
-    async Task DeleteSize(ShoeCatalog shoeCatalog)
+    async Task DeleteSize(ShopSportShoes.Models.Size size)
     {
-        await ShoeCatalogRepository.DeleteAsync(shoeCatalog.Id);
-        _shoeCatalogs.Remove(shoeCatalog);
+        await SizeRepository.DeleteAsync(size.Id);
+        _sizes.Remove(size);
     }
 
-    bool CheckContainItem(string name)
+    bool CheckContainItem(string size)
     {
-        return _shoeCatalogs.Any(x => x.Name == name);
+        return _sizes.Any(x => x.SizeName == size);
     }
 
     async Task AddSize()
@@ -91,9 +91,9 @@
                 Snackbar.Add("Size đã có rồi", Severity.Info);
                 return;
             }
-            ShoeCatalog shoeCatalog = new() { Name = _textSize };
-            await ShoeCatalogRepository.AddAsync(shoeCatalog);
-            _shoeCatalogs.Add(shoeCatalog);
+            ShopSportShoes.Models.Size size = new() { SizeName = _textSize };
+            await SizeRepository.AddAsync(size);
+            _sizes.Add(size);
             _textSize = null;
         }
         else

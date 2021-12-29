@@ -3,12 +3,13 @@
     <h2 style="white-space:nowrap">@Title</h2>
 </div>
 <MudGrid>
-    <ProductItem Shoe="@new()" />
-    <ProductItem Shoe="@new()" />
-    <ProductItem Shoe="@new()" />
-    <ProductItem Shoe="@new()" />
+    @foreach (var item in Shoes)
+    {
+        <ProductItem Shoe="@item" />
+    }
 </MudGrid>
 
 @code {
     [Parameter] public string Title { get; set; }
+    [Parameter] public List<Shoe> Shoes { get; set; }
 }

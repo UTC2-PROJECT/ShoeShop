@@ -6,16 +6,12 @@
 
   <ItemGroup>
     <Compile Remove="Auth0\**" />
-    <Compile Remove="Features\ProductDetail\**" />
     <Compile Remove="wwwroot\js\**" />
     <Content Remove="Auth0\**" />
-    <Content Remove="Features\ProductDetail\**" />
     <Content Remove="wwwroot\js\**" />
     <EmbeddedResource Remove="Auth0\**" />
-    <EmbeddedResource Remove="Features\ProductDetail\**" />
     <EmbeddedResource Remove="wwwroot\js\**" />
     <None Remove="Auth0\**" />
-    <None Remove="Features\ProductDetail\**" />
     <None Remove="wwwroot\js\**" />
   </ItemGroup>
 
@@ -30,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Blazored.FluentValidation" Version="2.0.3" />
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.55.0.2502" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.7" />

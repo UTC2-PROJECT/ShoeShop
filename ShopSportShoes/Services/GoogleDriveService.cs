@@ -1,7 +1,9 @@
-﻿using Google.Apis.Auth.OAuth2;
+﻿using Google;
+using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
+using Microsoft.AspNetCore.Components.Forms;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,11 +17,12 @@ namespace ShopSportShoes.Services
     {
         private string[] Scopes = { DriveService.Scope.Drive };
 
+        string _folderId = "1f-d7LnTDd63UyoCW3Iy2UnPU5Ylq1K5n";
+
         public GoogleDriveService()
         {
 
         }
-
         private DriveService GetDriveServiceInstance()
         {
             UserCredential credential;
@@ -48,29 +51,88 @@ namespace ShopSportShoes.Services
             return service;
         }
 
-        public string UploadFIle(string path)
+        public async Task<string> UploadFIleAsync(IBrowserFile browserFile, string imageName)
         {
             var service = GetDriveServiceInstance();
             var fileMetadata = new Google.Apis.Drive.v3.Data.File();
-            fileMetadata.Name = Path.GetFileName(path);
-            fileMetadata.MimeType = "image/jpeg";
+            fileMetadata.Name = imageName;
+            fileMetadata.MimeType = browserFile.ContentType;
+            fileMetadata.Parents = new List<string>() { _folderId };
+
             FilesResource.CreateMediaUpload request;
+
             try
             {
-                using (var stream = new FileStream(path, FileMode.Open))
+                using (var stream = browserFile.OpenReadStream(10240000))
                 {
-                    request = service.Files.Create(fileMetadata, stream, "image/jpeg");
-                    request.Fields = "id";
-                    request.Upload();
+                    request = service.Files.Create(fileMetadata, stream, browserFile.ContentType);
+                    request.Fields = "id, name, parents, createdTime, modifiedTime, mimeType, thumbnailLink, webViewLink, webContentLink";
+                    request.IncludePermissionsForView = "published";
+                    await request.UploadAsync();
                 }
                 var file = request.ResponseBody;
-                return file.Id;
+                return file?.Id;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return null;
             }
         }
 
+        public async Task<string> GetFileMetadataAsync(string imageName)
+        {
+            var service = GetDriveServiceInstance();
+            FilesResource.ListRequest listRequest = service.Files.List();
+            listRequest.Q = "parents in '" + _folderId + "'";
+            listRequest.Fields = "nextPageToken, files(id, name, thumbnailLink, webViewLink, webContentLink)";
+            var files = await listRequest.ExecuteAsync();
+            var file = files?.Files?.FirstOrDefault(x => x.Name == imageName)?.ThumbnailLink;
+
+            return files?.Files?.FirstOrDefault(x => x.Name == imageName)?.ThumbnailLink;
+        }
+        public async Task GetFileById(string id)
+        {
+            var service = GetDriveServiceInstance();
+            FilesResource.GetRequest filesResource = service.Files.Get(id);
+            filesResource.Fields = "thumbnailLink, webContentLink, name, webViewLink, mimeType";
+            Google.Apis.Drive.v3.Data.File file = new();
+            file = await filesResource.ExecuteAsync();
+
+            Console.WriteLine("Id: " + file.Id);
+            Console.WriteLine("ThumbnailLink: " + file.ThumbnailLink);
+            Console.WriteLine("WebContentLink: " + file.WebContentLink);
+            Console.WriteLine("WebViewLink: " + file.WebViewLink);
+
+        }
+        public async Task<bool> DeleteFileAsync(string imageName)
+        {
+            var service = GetDriveServiceInstance();
+            FilesResource.ListRequest listRequest = service.Files.List();
+            listRequest.Q = $"parents in '{_folderId}'";
+            listRequest.Fields = "nextPageToken, files(id, name)";
+            try
+            {
+                var files = await listRequest.ExecuteAsync();
+                var id = files?.Files?.FirstOrDefault(x => x.Name == imageName)?.Id;
+                var request = service.Files.Delete(id);
+                await request.ExecuteAsync();
+                return true;
+            }
+            catch (GoogleApiException)
+            {
+                return false;
+            }
+        }
+
+        public async Task DeleteRangeAsync(List<string> imageNames)
+        {
+            List<Task> tasks = new();
+            foreach (var item in imageNames)
+            {
+                var task = DeleteFileAsync(item);
+                tasks.Add(task);
+            }
+            await Task.WhenAll(tasks);
+        }
     }
 }

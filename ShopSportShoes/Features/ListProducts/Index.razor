@@ -1,0 +1,28 @@
+﻿@page "/sanpham/tatca"
+@inject ShoeRepository ShoeRepository
+
+
+
+<MudGrid>
+    <MudItem xs="12">
+        <img style="width:100%; object-fit:contain;" loading="lazy" src="./images/logos/tat-ca_794718c261704ee588af0a888d6d489a_master.jpg" />
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudGrid>
+            @foreach (var item in _shoes)
+            {
+                <ProductItem Shoe="@item" />
+            }
+        </MudGrid>
+    </MudItem>
+</MudGrid>
+
+@code {
+    List<Shoe> _shoes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _shoes = await ShoeRepository.GetAllLoadingAsync();
+    }
+}

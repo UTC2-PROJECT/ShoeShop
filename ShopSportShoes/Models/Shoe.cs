@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace ShopSportShoes.Models
 {
@@ -17,7 +18,7 @@ namespace ShopSportShoes.Models
         public string Title { get; set; }
         public double Price { get; set; }
         public string Description { get; set; }
-       
+        public string Trademark { get; set; }
         public int ShoeCatalogId { get; set; }
         public ShoeCatalog ShoeCatalogNavigation { get; set; }
         public List<ShoeSize> ShoeSizesNavigation { get; set; }
@@ -33,6 +34,7 @@ namespace ShopSportShoes.Models
 
     public class ShoeSize
     {
+        public int Id { get; set; }
         public int ShoeId { get; set; }
         public Shoe ShoeNavigation { get; set; }
         public int SizeId { get; set; }
@@ -43,8 +45,9 @@ namespace ShopSportShoes.Models
     {
         public int Id { get; set; }
         public string ImageName { get; set; }
-        public byte[] ImageSource { get; set; }
+        public string ThumbnailLink { get; set; }
         public int ShoeId { get; set; }
         public Shoe ShoeNavigation { get; set; }
     }
+
 }

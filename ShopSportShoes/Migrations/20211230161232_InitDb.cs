@@ -13,7 +13,7 @@ namespace ShopSportShoes.Migrations
                 {
                     Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    Name = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true)
+                    Name = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -58,6 +58,7 @@ namespace ShopSportShoes.Migrations
                     Title = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     Price = table.Column<double>(type: "BINARY_DOUBLE", nullable: false),
                     Description = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    Trademark = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     ShoeCatalogId = table.Column<int>(type: "NUMBER(10)", nullable: false)
                 },
                 constraints: table =>
@@ -128,7 +129,8 @@ namespace ShopSportShoes.Migrations
                 {
                     Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    Path = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    ImageName = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    ThumbnailLink = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     ShoeId = table.Column<int>(type: "NUMBER(10)", nullable: false)
                 },
                 constraints: table =>
@@ -164,23 +166,25 @@ namespace ShopSportShoes.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ShoeSize",
+                name: "ShoeSizes",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
                     ShoeId = table.Column<int>(type: "NUMBER(10)", nullable: false),
                     SizeId = table.Column<int>(type: "NUMBER(10)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShoeSize", x => new { x.ShoeId, x.SizeId });
+                    table.PrimaryKey("PK_ShoeSizes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ShoeSize_Shoes_ShoeId",
+                        name: "FK_ShoeSizes_Shoes_ShoeId",
                         column: x => x.ShoeId,
                         principalTable: "Shoes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ShoeSize_Size_SizeId",
+                        name: "FK_ShoeSizes_Size_SizeId",
                         column: x => x.SizeId,
                         principalTable: "Size",
                         principalColumn: "Id",
@@ -218,8 +222,13 @@ namespace ShopSportShoes.Migrations
                 column: "ShoeCatalogId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShoeSize_SizeId",
-                table: "ShoeSize",
+                name: "IX_ShoeSizes_ShoeId",
+                table: "ShoeSizes",
+                column: "ShoeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShoeSizes_SizeId",
+                table: "ShoeSizes",
                 column: "SizeId");
         }
 
@@ -238,7 +247,7 @@ namespace ShopSportShoes.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "ShoeSize");
+                name: "ShoeSizes");
 
             migrationBuilder.DropTable(
                 name: "Users");

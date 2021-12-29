@@ -57,11 +57,11 @@ namespace ShopSportShoes.Migrations
                     b.Property<string>("ImageName")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<byte[]>("ImageSource")
-                        .HasColumnType("RAW(2000)");
-
                     b.Property<int>("ShoeId")
                         .HasColumnType("NUMBER(10)");
+
+                    b.Property<string>("ThumbnailLink")
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("Id");
 
@@ -141,6 +141,9 @@ namespace ShopSportShoes.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("NVARCHAR2(2000)");
 
+                    b.Property<string>("Trademark")
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ShoeCatalogId");
@@ -156,6 +159,7 @@ namespace ShopSportShoes.Migrations
                         .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("Id");
@@ -165,17 +169,26 @@ namespace ShopSportShoes.Migrations
 
             modelBuilder.Entity("ShopSportShoes.Models.ShoeSize", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("NUMBER(10)")
+                        .HasAnnotation("Oracle:IdentityIncrement", 1)
+                        .HasAnnotation("Oracle:IdentitySeed", 1)
+                        .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
+
                     b.Property<int>("ShoeId")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<int>("SizeId")
                         .HasColumnType("NUMBER(10)");
 
-                    b.HasKey("ShoeId", "SizeId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShoeId");
 
                     b.HasIndex("SizeId");
 
-                    b.ToTable("ShoeSize");
+                    b.ToTable("ShoeSizes");
                 });
 
             modelBuilder.Entity("ShopSportShoes.Models.Size", b =>

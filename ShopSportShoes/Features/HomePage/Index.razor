@@ -1,16 +1,25 @@
 ﻿@page "/"
 @using ShopSportShoes.Features.HomePage.Components
 
+@inject ShoeRepository ShoeRepository
+
 
 <div style="width:100%; overflow:hidden; position:relative;">
     <img src="./images/logos/mustbuy_img_master.jpg" style="object-fit:contain; width:100%;" />
 </div>
-<br/>
-<ListNewRelease Title="MỚI PHÁT HÀNH"/>
+<br />
+<ListNewRelease Title="MỚI PHÁT HÀNH" Shoes="_newReleaseShoes.Take(4).ToList()"/>
 <br />
 <br />
-<ListNewRelease Title="SẢN PHẨM NỔI BẬT" />
+<ListNewRelease Title="SẢN PHẨM NỔI BẬT" Shoes="_newReleaseShoes.Take(4).ToList()"/>
 
 @code {
+    List<Shoe> _newReleaseShoes = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        _newReleaseShoes = await ShoeRepository.GetAllLoadingAsync();
+
+        base.OnInitialized();
+    }
 }

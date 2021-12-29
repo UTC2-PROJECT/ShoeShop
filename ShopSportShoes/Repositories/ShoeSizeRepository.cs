@@ -15,5 +15,12 @@ namespace ShopSportShoes.Repositories
         {
             _contextFactory = context;
         }
+      
+        public async Task AddRangeAsync(List<ShoeSize> shoeSizes)
+        {
+            var context = _contextFactory.CreateDbContext();
+            context.ShoeSizes.AddRange(shoeSizes);
+            await context.SaveChangesAsync();
+        }
     }
 }

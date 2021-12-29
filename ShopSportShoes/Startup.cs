@@ -60,14 +60,16 @@ namespace ShopSportShoes
             // Add services
             services.AddMudServices();
 
-            services.AddScoped<IBaseRepository<User>, UserRepository>();
-            services.AddScoped<IBaseRepository<Shoe>, ShoeRepository>();
-            services.AddScoped<IBaseRepository<Size>, SizeRepository>();
-            services.AddScoped<IBaseRepository<Image>, ImageRepository>();
-            services.AddScoped<IBaseRepository<ShoeSize>, ShoeSizeRepository>();
-            services.AddScoped<IBaseRepository<ShoeCatalog>, ShoeCatalogRepository>();
-
             services.AddSingleton<GoogleDriveService>();
+            services.AddSingleton<ShoeConfigService>();
+
+            services.AddSingleton<ShoeRepository>();
+            services.AddSingleton<UserRepository>();
+            services.AddSingleton<SizeRepository>();
+            services.AddSingleton<ShoeSizeRepository>();
+            services.AddSingleton<ImageRepository>();
+            services.AddSingleton<ShoeCatalogRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

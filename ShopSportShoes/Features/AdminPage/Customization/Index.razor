@@ -1,14 +1,25 @@
 ﻿@page "/admin/custom"
 @using ShopSportShoes.Features.AdminPage.Customization.Components
+@inject ShoeConfigService ShoeConfigService
 
 <MudGrid>
     <MudItem xs="4">
-        <ItemConfigCard />
+        <SizeConfigCard />
     </MudItem>
     <MudItem xs="4">
         <ShoeCatalogConfigCard />
     </MudItem>
+    <MudItem xs="4">
+        <ItemConfigCard Label="Thêm thương hiệu" ListData="_shoeConfig.Trademarks" 
+                        PropName="Trademarks" Data="_shoeConfig"/>
+    </MudItem>
 </MudGrid>
-@code {
+@code { 
+    ShoeConfig _shoeConfig;
 
+    protected override void OnInitialized()
+    {
+        _shoeConfig = ShoeConfigService.GetAll();
+        base.OnInitialized();
+    }
 }

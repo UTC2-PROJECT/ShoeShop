@@ -1,36 +1,36 @@
-﻿@inject IBaseRepository<ShopSportShoes.Models.Size> SizeRepository
+﻿@inject ShoeConfigService ShoeConfigService
 @inject ISnackbar Snackbar
 
 <MudCard>
     <MudCardHeader>
         <CardHeaderContent>
             <div class="d-flex align-items-center">
-                <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" Label="Thêm size" @bind-Value="_textSize" />
+                <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" Label="@Label" @bind-Value="_newValue" />
                 <MudTooltip Text="Thêm">
-                    <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="AddSize" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Success" OnClick="AddData" />
                 </MudTooltip>
             </div>
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
         <div style="height:200px; overflow-y:scroll;">
-            @foreach (var item in _sizes)
+            @foreach (var item in ListData)
             {
                 <div class="d-flex align-items-center justify-content-between mb-2">
-                    @if (_isEdit && _textSeleted == item.Id)
+                    @if (_isEdit && _textSeleted == item)
                     {
-                        <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="item.SizeName" />
+                        <MudTextField T="string" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="_editValue" />
                     }
                     else
                     {
-                        <span style="font-size:18px;" class="ml-2">@item.SizeName</span>
+                        <span style="font-size:18px;" class="ml-2">@item</span>
                     }
                     <div class="d-flex align-items-center">
-                        @if (_isEdit && _textSeleted == item.Id)
+                        @if (_isEdit && _textSeleted == item)
                         {
                             <MudIconButton Icon="@Icons.Material.Filled.Check" Color="Color.Warning"
                                            Class="mx-1" Size="MudBlazor.Size.Small"
-                                           OnClick="() => UpdateSize(item)" />
+                                           OnClick="() => UpdateData(_editValue)" />
                         }
                         else
                         {
@@ -40,7 +40,7 @@
                         }
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
                                        Class="mx-1" Size="MudBlazor.Size.Small"
-                                       OnClick="() => DeleteSize(item)" />
+                                       OnClick="() => DeleteData(item)" />
                     </div>
                 </div>
             }
@@ -48,53 +48,60 @@
     </MudCardContent>
 </MudCard>
 @code {
-    List<ShopSportShoes.Models.Size> _sizes = new();
+    [Parameter] public string Label { get; set; }
+    [Parameter] public List<string> ListData { get; set; }
+    [Parameter] public ShoeConfig Data { get; set; }
+    [Parameter] public string PropName { get; set; }
 
-    string _textSize;
-    int _textSeleted;
+    string _newValue;
+    string _textSeleted;
+    string _editValue;
     bool _isEdit;
 
-    protected override async Task OnInitializedAsync()
+    async Task UpdateData(string value)
     {
-        _sizes = await SizeRepository.GetAllAsync();
-    }
-    async Task UpdateSize(ShopSportShoes.Models.Size size)
-    {
-        await SizeRepository.UpdateAsync(size);
-        _textSeleted = 0;
+        if (string.IsNullOrEmpty(value))
+        {
+            Snackbar.Add("Nội dung không được trống", Severity.Info);
+            return;
+        }
+        var index = ListData.FindIndex(x => x == _textSeleted);
+        ListData[index] = value;
+        await ShoeConfigService.WriteToObjects(Data, PropName, ListData);
+        _textSeleted = null;
         _isEdit = false;
     }
 
-    void HandleEditClick(ShopSportShoes.Models.Size size)
+    void HandleEditClick(string value)
     {
-        _textSeleted = size.Id;
+        _textSeleted = value;
+        _editValue = value;
         _isEdit = true;
     }
 
-    async Task DeleteSize(ShopSportShoes.Models.Size size)
+    async Task DeleteData(string value)
     {
-        await SizeRepository.DeleteAsync(size.Id);
-        _sizes.Remove(size);
+        ListData.Remove(value);
+        await ShoeConfigService.WriteToObjects(Data, PropName, ListData);
     }
 
-    bool CheckContainItem(string size)
+    bool CheckContainItem(string value)
     {
-        return _sizes.Any(x => x.SizeName == size);
+        return ListData.Any(x => x == value);
     }
 
-    async Task AddSize()
+    async Task AddData()
     {
-        if (!string.IsNullOrEmpty(_textSize))
+        if (!string.IsNullOrEmpty(_newValue))
         {
-            if (CheckContainItem(_textSize))
+            if (CheckContainItem(_newValue))
             {
                 Snackbar.Add("Size đã có rồi", Severity.Info);
                 return;
             }
-            ShopSportShoes.Models.Size size = new() { SizeName = _textSize };
-            await SizeRepository.AddAsync(size);
-            _sizes.Add(size);
-            _textSize = null;
+            ListData.Add(_newValue);
+            await ShoeConfigService.WriteToObjects(Data, PropName, ListData);
+            _newValue = null;
         }
         else
         {

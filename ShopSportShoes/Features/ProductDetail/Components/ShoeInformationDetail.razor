@@ -1,0 +1,98 @@
+﻿
+<MudGrid>
+    <MudItem xs="5">
+        <div class="w-100">
+            <MudCard Style="height: 500px; overflow: hidden; position: relative; display: flex; align-items: center; ">
+                <img src="@(_presentImage ?? Shoe?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink)"
+                     style="object-fit: cover; width: 100%; cursor: pointer;" @onclick="() => {
+                                                                           _imgSrcOveray = _presentImage ?? Shoe?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink;
+                                                                           _isOverlay = true;
+                                                                       }" />
+            </MudCard>
+            <div class="w-100 d-flex align-items-center mt-2" style="overflow:hidden;">
+                @foreach (var item in Shoe.ImagesNavigation)
+                {
+                    <MudCard Style="width:100px; height:100px;" Class="ma-2 d-flex align-items-center">
+                        <img loading="lazy" src="@item.ThumbnailLink" style="object-fit:contain;width:100%; cursor:pointer;" @onclick="() => SwitchImage(item.ThumbnailLink)" />
+                    </MudCard>
+                }
+            </div>
+        </div>
+    </MudItem>
+    <MudItem xs="7">
+        <MudCard Style="width:100%" Class="pa-5">
+            <h1>@Shoe.Title</h1>
+            <div class="d-flex align-items-center mb-3">
+                <strong class="mr-2">Loại: </strong> @Shoe?.ShoeCatalogNavigation?.Name |&nbsp;<strong> Thương hiệu: &nbsp;</strong> Nike
+            </div>
+            <div class="d-flex align-items-center mb-3">
+                <strong class="mr-2 mud-primary-text" style="font-size: 2rem; font-weight: 400;">@string.Format("{0:#,##0} đ", Shoe.Price)</strong>
+            </div>
+            <div class="d-flex align-items-center mb-3">
+                <strong class="mr-2">Sizes</strong>
+                <div class="d-flex align-items-center ml-2">
+                    <MudChipSet @bind-SelectedChip="_chipSizeSeleted" Filter="true">
+                        @foreach (var item in Shoe.ShoeSizesNavigation.Select(x => x.SizeNavigation.SizeName))
+                        {
+                            <MudChip Color="Color.Dark" Style="font-weight:bold;">@item</MudChip>
+                        }
+                    </MudChipSet>
+
+
+                </div>
+            </div>
+            <div class="d-flex align-items-center mb-3">
+                <strong class="mr-2">Số lượng</strong>
+                <div class="d-flex align-items-center">
+                    <MudChip Icon="@Icons.Filled.ExposureNeg1" @onclick="() => {
+                                                                         --_quantity;
+                                                                          if (_quantity <= 0)
+                                                                              _quantity = 1;
+
+                                                                      }"></MudChip>
+                    <MudChip Size="MudBlazor.Size.Large"><strong style="font-size:1.3rem" class="px-5">@_quantity</strong></MudChip>
+                    <MudChip Icon="@Icons.Filled.ExposurePlus1" @onclick="() => ++_quantity"></MudChip>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center mb-3">
+                <MudButton Color="Color.Primary" FullWidth="true"
+                           Variant="Variant.Filled">MUA NGAY</MudButton>
+                <MudButton Color="Color.Primary" FullWidth="true"
+                           Variant="Variant.Outlined" Class="mx-2">THÊM VÀO GIỎ</MudButton>
+            </div>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12">
+       <MudTabs>
+           <MudTabPanel Text="Mô tả">
+               <MudContainer Class="mt-5">
+                   <p>@((MarkupString)Shoe.Description)</p>
+               </MudContainer>
+           </MudTabPanel>
+       </MudTabs>
+    </MudItem>
+    
+
+</MudGrid>
+
+<ImageOverlay @bind-IsOpen="_isOverlay" @bind-ImageSource="_imgSrcOveray" />
+
+@code {
+    [Parameter] public Shoe Shoe { get; set; }
+
+    MudChip _chipSizeSeleted;
+
+    string _presentImage;
+    string _imgSrcOveray;
+
+    bool _isOverlay;
+
+    int _quantity = 1;
+
+    void SwitchImage(string result)
+    {
+        _presentImage = result;
+    }
+
+}

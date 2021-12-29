@@ -1,62 +1,116 @@
 ﻿@page "/admin/product-management"
 
-@inject IBaseRepository<Shoe> ShoeRepository
-@inject IBaseRepository<ShoeCatalog> ShoeCatalogRepository
-@inject IBaseRepository<ShopSportShoes.Models.Size> SizeRepository
+@inject ImageRepository ImageRepository
+@inject ShoeRepository ShoeRepository
+@inject ShoeSizeRepository ShoeSizeRepository
+@inject SizeRepository SizeRepository
+@inject ShoeCatalogRepository ShoeCatalogRepository
+@inject GoogleDriveService GoogleDriveService
+@inject ISnackbar Snackbar
+
 @inject IDialogService DialogService
 
 @using ShopSportShoes.Features.AdminPage.ProductManagement.Components
 
-<MudTable ServerData="@(new Func<TableState, Task<TableData<Shoe>>>(ServerReload))"
-          Dense="true" Hover="true" @ref="_shoetable" Virtualize="true"
-          Height="70vh" FixedFooter="true" FixedHeader="true">
-    <ToolBarContent>
-        <MudButton OnClick="HandleAddProduct" Color="Color.Primary" Variant="Variant.Outlined">Thêm sản phẩm</MudButton>
-        <MudSpacer />
-        <MudSpacer />
-        <MudSpacer />
-        <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Tìm kiếm" Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Search" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh><MudTableSortLabel SortLabel="title_field" T="Shoe">Tiêu đề</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="description_field" T="Shoe">Mô tả</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="images_field" T="Shoe">Hình ảnh</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="sizes_field" T="Shoe">Size</MudTableSortLabel></MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Title">@context.Title</MudTd>
-        <MudTd DataLabel="Description">@context.Description</MudTd>
-        <MudTd DataLabel="Images">@context?.ImagesNavigation</MudTd>
-        <MudTd DataLabel="Sizes">@(string.Join(", ", context.ShoeSizesNavigation.Select(x => x.SizeNavigation.SizeName)))</MudTd>
-    </RowTemplate>
-    <NoRecordsContent>
-        <MudText>Không có gì</MudText>
-    </NoRecordsContent>
-    <LoadingContent>
-        <MudText>Đang load...</MudText>
-    </LoadingContent>
-    <PagerContent>
-        <MudTablePager />
-    </PagerContent>
-</MudTable>
+<div style="position:relative">
+    <MudTable ServerData="@(new Func<TableState, Task<TableData<Shoe>>>(ServerReload))"
+              Dense="true" Hover="true" @ref="_shoetable" Virtualize="true"
+              Height="70vh" FixedFooter="true" FixedHeader="true">
+        <ToolBarContent>
+            <MudButton OnClick="() => ShowDialogForm(isEdit: false)" Color="Color.Primary" Variant="Variant.Outlined">Thêm sản phẩm</MudButton>
+            <MudSpacer />
+            <MudSpacer />
+            <MudSpacer />
+            <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Tìm kiếm" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortLabel="title_field" T="Shoe">Tiêu đề</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="description_field" T="Shoe">Mô tả</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="images_field" T="Shoe">Hình ảnh</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="sizes_field" T="Shoe">Size</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="sizes_field" T="Shoe">Đơn giá</MudTableSortLabel></MudTh>
+            <MudTh>Action</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Title">@context.Title</MudTd>
+            <MudTd DataLabel="Description">@context.Description</MudTd>
+            <MudTd DataLabel="Images">
+                <img src="@(context?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink)"
+                     style="object-fit:contain; width:100px;height:100px" @onclick="() => {
+                                                                                    _isOpenOverlay = true;
+                                                                                    _imgSrcOverlay = context?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink;
+                                                                                }" />
+            </MudTd>
+            <MudTd DataLabel="Sizes">@(string.Join(", ", context?.ShoeSizesNavigation?.Select(x => x?.SizeNavigation?.SizeName)))</MudTd>
+            <MudTd DataLabel="Sizes" Style="color:red; font-weight:bold;">@string.Format("{0:#,##0} đ", context.Price)</MudTd>
+            <MudTd>
+                <div class="d-flex justify-content-center justify-content-center">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Class="mx-1"
+                                   Color="Color.Warning" Size="MudBlazor.Size.Small"
+                                   OnClick="() => ShowDialogForm(isEdit:true, shoeEdit: context)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Class="mx-1"
+                                   Color="Color.Error" Size="MudBlazor.Size.Small"
+                                   OnClick="() => HandleDelete(context)" />
+                </div>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText>Không có gì</MudText>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText>Đang load...</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
 
+    </MudTable>
+    <MudOverlay Visible="_isLoading" LightBackground="true" Absolute="true">
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    </MudOverlay>
+</div>
+<ImageOverlay @bind-IsOpen="@_isOpenOverlay" @bind-ImageSource="@_imgSrcOverlay" />
 @code {
     List<Shoe> _shoes = new();
     List<ShoeCatalog> _shoeCatalogs = new();
     List<ShopSportShoes.Models.Size> _sizes = new();
     IEnumerable<Shoe> _pagedData;
+    Dictionary<int, List<string>> _dataLink = new();
 
     MudTable<Shoe> _shoetable;
 
     string _searchString;
+    string _imgSrcOverlay;
+
     int _totalItems;
+
+    bool _isOpenOverlay;
+    bool _isLoading;
 
     protected override async Task OnInitializedAsync()
     {
-        _shoes = await ShoeRepository.GetAllAsync();
+        _shoes = await ShoeRepository.GetAllLoadingAsync();
         _sizes = await SizeRepository.GetAllAsync();
         _shoeCatalogs = await ShoeCatalogRepository.GetAllAsync();
+    }
+
+    async Task HandleDelete(Shoe shoe)
+    {
+        _isLoading = true;
+        // delete images
+        await GoogleDriveService.DeleteRangeAsync(shoe.ImagesNavigation.Select(x => x.ImageName).ToList());
+        //foreach (var image in shoe.ImagesNavigation)
+        //{
+        //    await ImageRepository.DeleteAsync(image.Id);
+        //}
+
+        // delete shoe
+        await ShoeRepository.DeleteAsync(shoe.Id);
+        _shoes.Remove(shoe);
+        await _shoetable.ReloadServerData();
+        Snackbar.Add("Đã xoá", Severity.Info);
+        _isLoading = false;
     }
 
     async Task<TableData<Shoe>> ServerReload(TableState state)
@@ -89,6 +143,7 @@
         }
 
         _pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+
         return new TableData<Shoe>() { TotalItems = _totalItems, Items = _pagedData };
     }
 
@@ -98,13 +153,21 @@
         _shoetable.ReloadServerData();
     }
 
-    void HandleAddProduct()
+    async Task ShowDialogForm(bool isEdit, Shoe shoeEdit = null)
     {
         DialogOptions options = new() { DisableBackdropClick = true };
         DialogParameters parameters = new();
         parameters.Add("Sizes", _sizes);
         parameters.Add("Catalogs", _shoeCatalogs);
+        parameters.Add("IsEdit", isEdit);
+        parameters.Add("Shoe", shoeEdit ?? new());
 
-        DialogService.Show<SaveProductModal>("", parameters, options);
+        var dialog = DialogService.Show<SaveProductModal>("", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            _shoes = await ShoeRepository.GetAllLoadingAsync();
+            await _shoetable.ReloadServerData();
+        }
     }
 }
