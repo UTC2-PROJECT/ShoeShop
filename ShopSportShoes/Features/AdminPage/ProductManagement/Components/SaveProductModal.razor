@@ -65,13 +65,13 @@
                                   For="() => Shoe.Price" Validation="@(ShoeValidation.ValidateValue)" />
                 </MudItem>
                 <MudItem xs="6">
-                    <MudSelect T="ShoeCatalog" Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense"
-                               OffsetY="true" Label="Loại giày" @bind-Value="Shoe.ShoeCatalogNavigation"
-                               For="() => Shoe.ShoeCatalogNavigation" Validation="@(ShoeValidation.ValidateValue)"
-                               ToStringFunc="(e) => e?.Name">
-                        @foreach (var item in Catalogs)
+                    <MudSelect T="string" Variant="Variant.Outlined" Dense="true" Margin="Margin.Dense"
+                               OffsetY="true" Label="Thương hiệu" @bind-Value="Shoe.Trademark"
+                               For="() => Shoe.Trademark" Validation="@(ShoeValidation.ValidateValue)"
+                               ToStringFunc="(e) => e">
+                        @foreach (var item in ShoeConfig?.Trademarks)
                         {
-                            <MudSelectItem Value="@item">@item.Name</MudSelectItem>
+                            <MudSelectItem Value="@item">@item</MudSelectItem>
                         }
                     </MudSelect>
                 </MudItem>
@@ -136,6 +136,7 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public List<ShopSportShoes.Models.Size> Sizes { get; set; }
     [Parameter] public List<ShoeCatalog> Catalogs { get; set; }
+    [Parameter] public ShoeConfig ShoeConfig { get; set; }
     [Parameter] public Shoe Shoe { get; set; }
     [Parameter] public bool IsEdit { get; set; }
 

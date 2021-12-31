@@ -4,6 +4,7 @@ using ShopSportShoes.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ShopSportShoes.Repositories
@@ -20,6 +21,16 @@ namespace ShopSportShoes.Repositories
         {
             var context = _contextFactory.CreateDbContext();
             return await context.Shoes.Include(x => x.ImagesNavigation)
+                                      .Include(x => x.ShoeSizesNavigation)
+                                        .ThenInclude(x => x.SizeNavigation)
+                                      .Include(x => x.ShoeCatalogNavigation)
+                                      .ToListAsync();
+        }
+
+        public async Task<List<Shoe>> GetFilterCustomizeAsync(Expression<Func<Shoe, bool>> filter)
+        {
+            var context = _contextFactory.CreateDbContext();
+            return await context.Shoes.Where(filter).Include(x => x.ImagesNavigation)
                                       .Include(x => x.ShoeSizesNavigation)
                                         .ThenInclude(x => x.SizeNavigation)
                                       .Include(x => x.ShoeCatalogNavigation)

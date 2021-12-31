@@ -23,7 +23,7 @@
         <MudCard Style="width:100%" Class="pa-5">
             <h1>@Shoe.Title</h1>
             <div class="d-flex align-items-center mb-3">
-                <strong class="mr-2">Loại: </strong> @Shoe?.ShoeCatalogNavigation?.Name |&nbsp;<strong> Thương hiệu: &nbsp;</strong> Nike
+                <strong class="mr-2">Loại: </strong> @Shoe?.ShoeCatalogNavigation?.Name |&nbsp;<strong> Thương hiệu: &nbsp;</strong> @Shoe?.Trademark
             </div>
             <div class="d-flex align-items-center mb-3">
                 <strong class="mr-2 mud-primary-text" style="font-size: 2rem; font-weight: 400;">@string.Format("{0:#,##0} đ", Shoe.Price)</strong>
@@ -61,18 +61,19 @@
                 <MudButton Color="Color.Primary" FullWidth="true"
                            Variant="Variant.Outlined" Class="mx-2">THÊM VÀO GIỎ</MudButton>
             </div>
+
         </MudCard>
     </MudItem>
     <MudItem xs="12">
-       <MudTabs>
-           <MudTabPanel Text="Mô tả">
-               <MudContainer Class="mt-5">
-                   <p>@((MarkupString)Shoe.Description)</p>
-               </MudContainer>
-           </MudTabPanel>
-       </MudTabs>
+        <MudTabs>
+            <MudTabPanel Text="Mô tả">
+                <MudContainer Class="mt-5">
+                    <p>@((MarkupString)Shoe.Description)</p>
+                </MudContainer>
+            </MudTabPanel>
+        </MudTabs>
     </MudItem>
-    
+
 
 </MudGrid>
 
@@ -94,5 +95,4 @@
     {
         _presentImage = result;
     }
-
 }

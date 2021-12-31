@@ -3,13 +3,16 @@
     <h2 style="white-space:nowrap">@Title</h2>
 </div>
 <MudGrid>
-    @foreach (var item in Shoes)
+    @foreach (var item in Shoes.Take(NumberOfItem).ToList())
     {
-        <ProductItem Shoe="@item" />
+        <MudItem xs="12" md="@(12/NumberOfItem)" lg="@(12/NumberOfItem)" >
+            <ProductItem Shoe="@item" />
+        </MudItem>
     }
 </MudGrid>
 
 @code {
     [Parameter] public string Title { get; set; }
+    [Parameter] public int NumberOfItem { get; set; }
     [Parameter] public List<Shoe> Shoes { get; set; }
 }

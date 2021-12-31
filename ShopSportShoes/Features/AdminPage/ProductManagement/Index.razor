@@ -6,6 +6,7 @@
 @inject SizeRepository SizeRepository
 @inject ShoeCatalogRepository ShoeCatalogRepository
 @inject GoogleDriveService GoogleDriveService
+@inject ShoeConfigService ShoeConfigService
 @inject ISnackbar Snackbar
 
 @inject IDialogService DialogService
@@ -26,15 +27,15 @@
         </ToolBarContent>
         <HeaderContent>
             <MudTh><MudTableSortLabel SortLabel="title_field" T="Shoe">Tiêu đề</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortLabel="description_field" T="Shoe">Mô tả</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="trademark_field" T="Shoe">Thương hiệu</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="images_field" T="Shoe">Hình ảnh</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="sizes_field" T="Shoe">Size</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortLabel="sizes_field" T="Shoe">Đơn giá</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="price_field" T="Shoe">Đơn giá</MudTableSortLabel></MudTh>
             <MudTh>Action</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Title">@context.Title</MudTd>
-            <MudTd DataLabel="Description">@context.Description</MudTd>
+            <MudTd DataLabel="Description">@context.Trademark</MudTd>
             <MudTd DataLabel="Images">
                 <img src="@(context?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink)"
                      style="object-fit:contain; width:100px;height:100px" @onclick="() => {
@@ -79,6 +80,7 @@
     Dictionary<int, List<string>> _dataLink = new();
 
     MudTable<Shoe> _shoetable;
+    ShoeConfig _shoeConfig;
 
     string _searchString;
     string _imgSrcOverlay;
@@ -93,6 +95,7 @@
         _shoes = await ShoeRepository.GetAllLoadingAsync();
         _sizes = await SizeRepository.GetAllAsync();
         _shoeCatalogs = await ShoeCatalogRepository.GetAllAsync();
+        _shoeConfig = ShoeConfigService.GetAll();
     }
 
     async Task HandleDelete(Shoe shoe)
@@ -100,10 +103,6 @@
         _isLoading = true;
         // delete images
         await GoogleDriveService.DeleteRangeAsync(shoe.ImagesNavigation.Select(x => x.ImageName).ToList());
-        //foreach (var image in shoe.ImagesNavigation)
-        //{
-        //    await ImageRepository.DeleteAsync(image.Id);
-        //}
 
         // delete shoe
         await ShoeRepository.DeleteAsync(shoe.Id);
@@ -125,7 +124,7 @@
                 return true;
             if (element.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
                 return true;
-            if ($"{element.Title} {element.Description} {element.Price.ToString()}".Contains(_searchString))
+            if ($"{element.Title} {element.Price.ToString()} {element.Trademark} {string.Join(", ", element.ShoeSizesNavigation.Select(x => x.SizeNavigation.SizeName))}".Contains(_searchString))
                 return true;
             return false;
         }).ToList();
@@ -161,6 +160,7 @@
         parameters.Add("Catalogs", _shoeCatalogs);
         parameters.Add("IsEdit", isEdit);
         parameters.Add("Shoe", shoeEdit ?? new());
+        parameters.Add("ShoeConfig", _shoeConfig);
 
         var dialog = DialogService.Show<SaveProductModal>("", parameters, options);
         var result = await dialog.Result;

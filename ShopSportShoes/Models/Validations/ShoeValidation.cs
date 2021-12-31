@@ -13,6 +13,7 @@ namespace ShopSportShoes.Models.Validations
             RuleFor(x => x.Title).NotEmpty().WithMessage("Tiêu đề bị trống");
             RuleFor(x => x.Description).NotEmpty().WithMessage("Mô tả bị trống");
             RuleFor(x => x.Price).GreaterThan(0).WithMessage("Số tiền phải lớn hơn 0");
+            RuleFor(x => x.Trademark).NotEmpty().WithMessage("thương hiệu bị trống");
             RuleFor(x => x.ShoeCatalogNavigation).NotEmpty().WithMessage("Loại giày không được trống");
 
         }

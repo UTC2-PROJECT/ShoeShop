@@ -3,20 +3,27 @@
 @inject ShoeRepository ShoeRepository
 
 @using ShopSportShoes.Features.ProductDetail.Components
+@using ShopSportShoes.Features.HomePage.Components
  
 <MudGrid>
     <MudItem xs="12">
         <ShoeInformationDetail Shoe="_shoe"/>
+    </MudItem>
+    <MudItem xs="12"> 
+        <ListNewRelease Title="SẢM PHẨM LIÊN QUAN" Shoes="_shoes.Take(4).ToList()" NumberOfItem="4"/>
     </MudItem>
 </MudGrid>
 
 @code {
     [Parameter] public int ShoeId { get; set; }
 
+    List<Shoe> _shoes = new();
+
     Shoe _shoe = new();
 
     protected override async Task OnInitializedAsync()
     {
         _shoe = await ShoeRepository.GetByIdDetailsAsync(ShoeId);
+        _shoes = await ShoeRepository.GetFilterCustomizeAsync(x => x.Trademark == _shoe.Trademark);
     }
 }

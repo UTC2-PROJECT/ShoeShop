@@ -11,14 +11,14 @@
             transform: scale(1.1);
         }
 </style>
-
-<MudItem xs="12" md="3" lg="3" Style="cursor:pointer;" @onclick="HandleOnClickItem">
+<div @onclick="HandleOnClickItem" style="cursor:pointer; width:100%;">
     <div style="width:100%; height:300px; overflow:hidden" class="d-flex align-items-center">
         <img loading="lazy" class="product-item__img" src="@Shoe?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink" />
     </div>
     <p class="my-2">@Shoe.Title</p>
     <span class="mud-primary-text font-weight-bold">@(string.Format("{0:#,##0} đ", Shoe.Price))</span>
-</MudItem>
+</div>
+
 
 @code {
     [Parameter] public Shoe Shoe { get; set; }
