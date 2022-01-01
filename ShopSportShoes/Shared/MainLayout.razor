@@ -1,16 +1,23 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserRepository UserRepository
+@inject ISnackbar Snackbar
 
 @if (!NavigationManager.Uri.Contains("admin"))
 {
     @* HEADER *@
     <HeaderPage />
-    <NavMenu />
+    <CascadingValue Value="_uriCascaded">
+        <NavMenu />
+    </CascadingValue>
     <br />
 
     @* BODY *@
     <MudContainer>
-        @Body
+        <CascadingValue Value="_uriCascaded">
+            @Body
+        </CascadingValue>
     </MudContainer>
     @* FOOTER *@
     <Footer />
@@ -28,15 +35,18 @@ else
                 <MudDrawer @bind-Open="@open" Elevation="1">
                     <MudDrawerHeader>
                         <div style="width:100%; overflow:hidden;">
-                            <img src="./images/logos/logo.jpg" style="object-fit:contain; width:100%; cursor:pointer;"
-                                 @onclick="@(() => NavigationManager.NavigateTo("/"))" />
+                            <MudLink Href="/" Target="_blank | _self | _parent | _top | framename">
+                                <img src="./images/logos/logo.jpg" style="object-fit:contain; width:100%; cursor:pointer;" />
+                            </MudLink>
                         </div>
                     </MudDrawerHeader>
                     <ShopSportShoes.Features.AdminPage.Components.AdminNavMenu />
                 </MudDrawer>
                 <MudMainContent Class="pt-16 px-16">
                     <MudContainer Class="mt-6">
-                        @Body
+                        <CascadingValue Value="_userCascaded">
+                            @Body
+                        </CascadingValue>
                     </MudContainer>
                 </MudMainContent>
             </MudLayout>
@@ -51,8 +61,16 @@ else
     bool _isAdminMode;
     bool open = true;
 
+    string _uriCascaded => NavigationManager.Uri.Replace("https://localhost:44302", "");
+
+    User _userCascaded = new();
+
     protected override void OnInitialized()
     {
+        var authState = AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var email = authState.Result.User.FindFirst(ClaimTypes.Email)?.Value;
+        _userCascaded = UserRepository.GetUserByEmail(email) ?? new();
+
         base.OnInitialized();
     }
 

@@ -1,4 +1,6 @@
-﻿<style>
+﻿@inject NavigationManager NavigationManager
+
+<style>
     .menu-item {
         cursor: pointer;
         font-weight: bold;
@@ -20,7 +22,7 @@
         @foreach (var item in _listTitle.Keys)
         {
             <MudLink Href="@item" Underline="Underline.None">
-                <div class="menu-item d-flex align-items-center justify-content-center mx-3 pa-2 @(_itemSelected == _listTitle[item] ? "active-item":"")" @onclick="@(() => _itemSelected = _listTitle[item])">
+                <div class="menu-item d-flex align-items-center justify-content-center mx-3 pa-2 @(item == NavigationManager.Uri.Replace("https://localhost:44302", "") ? "active-item":"")">
                     @_listTitle[item]
                 </div>
             </MudLink>
@@ -29,7 +31,7 @@
         <AuthorizeView Roles="Admin">
             <Authorized>
                 <MudLink Href="/admin" Underline="Underline.None">
-                    <div class="menu-item d-flex align-items-center justify-content-center mx-3 pa-2 @(_itemSelected == "Admin" ? "active-item":"")" @onclick="@(() => _itemSelected = "Admin")">
+                    <div class="menu-item d-flex align-items-center justify-content-center mx-3 pa-2 @(UriCascaded.Contains("admin") ? "active-item":"")">
                         Admin
                     </div>
                 </MudLink>
@@ -39,12 +41,10 @@
 </MudContainer>
 
 @code{
-
+    [CascadingParameter] public string UriCascaded { get; set; }
 
     //List<string> _listTitle = new() { "Trang chủ", "Tất cả sản phẩm", "Giày cỏ nhân tạo", "Giày Futsal", "Giày trẻ em", "Admin" };
     Dictionary<string, string> _listTitle = new();
-
-    string _itemSelected = "Trang chủ";
 
     protected override void OnInitialized()
     {

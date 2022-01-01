@@ -1,0 +1,31 @@
+﻿@page "/sanpham/{text}"
+@inject ShoeRepository ShoeRepository
+
+<ShowListProduct Shoes="_shoes" Title="@($"Kết quả tìm kiếm: \"{Text}\"")" IsShowSortControl="true" PageSize="8"/>
+
+@code {
+    [Parameter] public string Text { get; set; }
+
+    List<Shoe> _shoes = new();
+
+    int _pageSelected;
+    int _totalPages => _shoes.Count % 8 == 0 ? _shoes.Count / 8 : (_shoes.Count % 8 > 0 ? (_shoes.Count / 8 + 1) : 0);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Text))
+        {
+            _shoes = await ShoeRepository.GetAllLoadingAsync();
+            _shoes = _shoes.Where(x => $"{x.Title} {x.Trademark} {x.ShoeCatalogNavigation.Name}".Contains(Text, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(Text))
+        {
+            _shoes = await ShoeRepository.GetAllLoadingAsync();
+            _shoes = _shoes.Where(x => $"{x.Title} {x.Trademark} {x.ShoeCatalogNavigation.Name}".Contains(Text, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+    }
+}

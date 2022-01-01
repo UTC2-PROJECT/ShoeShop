@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using ShopSportShoes.Models.Identity;
 using ShopSportShoes.Areas;
 using ShopSportShoes.Areas.Identity.Data;
+using ShopSportShoes.Services;
 
 [assembly: HostingStartup(typeof(IdentityStartup))]
 namespace ShopSportShoes.Areas

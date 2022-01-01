@@ -10,8 +10,12 @@
         <ShoeCatalogConfigCard />
     </MudItem>
     <MudItem xs="4">
-        <ItemConfigCard Label="Thêm thương hiệu" ListData="_shoeConfig.Trademarks" 
-                        PropName="Trademarks" Data="_shoeConfig"/>
+        <ItemConfigCard Label="Thêm thương hiệu" ListData="_shoeConfig.Trademarks"
+                        PropName="Trademarks" Data="_shoeConfig" />
+    </MudItem>
+    <MudItem xs="4">
+        <ItemConfigCard Label="Thêm khoảng giá" ListData="_shoeConfig.PriceRanges"
+                        PropName="PriceRanges" Data="_shoeConfig" />
     </MudItem>
 </MudGrid>
 @code { 

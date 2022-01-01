@@ -25,6 +25,7 @@ using ShopSportShoes.Repositories;
 using ShopSportShoes.Models;
 using MudBlazor.Services;
 using ShopSportShoes.Services;
+using MudBlazor;
 
 namespace ShopSportShoes
 {
@@ -44,6 +45,19 @@ namespace ShopSportShoes
             services.AddHttpContextAccessor();
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddMemoryCache();
+
+            services.AddMudServices(config =>
+            {
+                config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopCenter;
+                config.SnackbarConfiguration.PreventDuplicates = false;
+                config.SnackbarConfiguration.NewestOnTop = true;
+                config.SnackbarConfiguration.ShowCloseIcon = true;
+                config.SnackbarConfiguration.VisibleStateDuration = 3000;
+                config.SnackbarConfiguration.HideTransitionDuration = 500;
+                config.SnackbarConfiguration.ShowTransitionDuration = 500;
+                config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+            });
 
             services.AddSession(options =>
             {
@@ -60,8 +74,9 @@ namespace ShopSportShoes
             // Add services
             services.AddMudServices();
 
-            services.AddSingleton<GoogleDriveService>();
+            services.AddScoped<GoogleDriveService>();
             services.AddSingleton<ShoeConfigService>();
+            services.AddScoped<UserManagerService>();
 
             services.AddSingleton<ShoeRepository>();
             services.AddSingleton<UserRepository>();

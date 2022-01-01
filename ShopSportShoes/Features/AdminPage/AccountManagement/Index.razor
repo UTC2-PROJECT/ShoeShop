@@ -1,0 +1,168 @@
+﻿@page "/admin/account-management"
+@inject UserRepository UserRepository
+@inject UserManagerService UserManagerService
+
+@inject IDialogService DialogService
+
+@using ShopSportShoes.Features.AdminPage.AccountManagement.Components
+
+<div style="position:relative">
+    <MudTable ServerData="@(new Func<TableState, Task<TableData<User>>>(ServerReload))"
+              Dense="true" Hover="true" @ref="_usertable" Virtualize="true"
+              Height="70vh" FixedFooter="true" FixedHeader="true">
+        <ToolBarContent>
+            <MudButton OnClick="() => ShowDialogForm(isEdit: false)"
+                       Color="Color.Primary" Variant="Variant.Outlined">Thêm tài khoản</MudButton>
+            <MudSpacer />
+            <MudSpacer />
+            <MudSpacer />
+            <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Tìm kiếm" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortLabel="name_field" T="Shoe">Tên người dùng</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="email_field" T="Shoe">Email</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="roles_field" T="Shoe">Quyền</MudTableSortLabel></MudTh>
+            <MudTh>Action</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Email">@string.Join(", ", context.Roles)</MudTd>
+            <MudTd>
+                <div class="d-flex justify-content-center justify-content-center">
+                    <MudTooltip Text="Chỉnh sửa">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Class="mx-1"
+                                       Color="Color.Warning" Size="MudBlazor.Size.Small"
+                                       OnClick="() => ShowDialogForm(isEdit:true, user: context)" />
+                    </MudTooltip>
+                    <MudTooltip Text="Xoá">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Class="mx-1"
+                                       Color="Color.Error" Size="MudBlazor.Size.Small"
+                                       OnClick="() => HandleDelete(context)" />
+                    </MudTooltip>
+                </div>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText>Không có gì</MudText>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText>Đang load...</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+
+    </MudTable>
+    <MudOverlay Visible="_isLoading" LightBackground="true" Absolute="true">
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    </MudOverlay>
+</div>
+
+@code {
+    List<User> _users = new();
+    IEnumerable<User> _pagedData;
+    MudTable<User> _usertable;
+
+    string _searchString;
+    bool _isLoading;
+    int _totalItems;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await UserRepository.GetAllAsync();
+        foreach (var item in _users)
+        {
+            item.Roles = await UserManagerService.GetRolesAsync(item.Email);
+        }
+    }
+
+    async Task ReloadAsync()
+    {
+        _users = await UserRepository.GetAllAsync();
+        foreach (var item in _users)
+        {
+            item.Roles = await UserManagerService.GetRolesAsync(item.Email);
+        }
+        await _usertable.ReloadServerData();
+    }
+
+    async Task<TableData<User>> ServerReload(TableState state)
+    {
+        await Task.Delay(300);
+
+        var data = _users.Where(element =>
+        {
+            if (string.IsNullOrWhiteSpace(_searchString))
+                return true;
+            if (element.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (element.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if ($"{element.Name} {element.Email} {string.Join(", ", element.Roles)}".Contains(_searchString))
+                return true;
+            return false;
+        }).ToList();
+
+        _totalItems = data.Count();
+
+        switch (state.SortLabel)
+        {
+            case "name_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Name).ToList();
+                break;
+            case "email_field":
+                data = data.OrderByDirection(state.SortDirection, o => o.Email).ToList();
+                break;
+        }
+
+        _pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+
+        return new TableData<User>() { TotalItems = _totalItems, Items = _pagedData };
+    }
+
+
+    void OnSearch(string text)
+    {
+        _searchString = text;
+        _usertable.ReloadServerData();
+    }
+
+    async Task ShowDialogForm(bool isEdit, User user = null)
+    {
+        DialogOptions options = new() { DisableBackdropClick = true };
+        DialogParameters parameters = new();
+        parameters.Add("User", user ?? new());
+        parameters.Add("IsEdit", isEdit);
+        var dialog = DialogService.Show<SaveAccountDialog>("", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            _isLoading = true;
+            var data = (User)result.Data;
+            if (!isEdit)
+            {
+                _users.Insert(0, data);
+                await _usertable.ReloadServerData();
+            }
+            else
+            {
+                var index = _users.FindIndex(x => x.Id == data.Id);
+                _users[index] = data;
+                await _usertable.ReloadServerData();
+            }
+            _isLoading = false;
+        }
+    }
+
+    async Task HandleDelete(User user)
+    {
+        _isLoading = true;
+        await UserRepository.DeleteAsync(user.Id);
+        await UserManagerService.DeleteUserByEmailAsync(user.Email);
+        _users.Remove(user);
+        await _usertable.ReloadServerData();
+        _isLoading = false;
+    }
+}

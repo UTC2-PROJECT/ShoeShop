@@ -1,55 +1,58 @@
 ﻿@page "/sanpham/tatca"
+
+
 @inject ShoeRepository ShoeRepository
 @using LinqKit
-
+@using ShopSportShoes.Features.ListProducts.Components
 <MudGrid>
-    <MudItem xs="4">
-
+    <MudItem xs="3">
+        <ShoeFilterControl FilterChanged="HandleFilterChanged" />
     </MudItem>
-    <MudItem xs="8">
+    <MudItem xs="9">
         <MudGrid>
+
             <MudItem xs="12">
                 <img style="width:100%; object-fit:contain;" loading="lazy" src="./images/logos/tat-ca_794718c261704ee588af0a888d6d489a_master.jpg" />
             </MudItem>
 
             <MudItem xs="12">
-                <div class="d-flex align-items-center justify-content-between" >
-                    <h1 class="pa-0 ma-0">TẤT CẢ SẢN PHẢM</h1>
-                    <div style="width:200px;">
-                        <MudSelect T="string" Variant="Variant.Outlined" Margin="Margin.Dense"
-                                   Dense="true" Label="Sắp xếp"
-                                   Clearable="true"
-                                   ValueChanged="(e) => HandleSortChange(e)">
-                            <MudSelectItem Value="@("Giá tăng dần")" />
-                            <MudSelectItem Value="@("Giá giảm dần")" />
-                            <MudSelectItem Value="@("Tên A-Z")" />
-                            <MudSelectItem Value="@("Tên Z-A")" />
-                            <MudSelectItem Value="@("Mới nhất")" />
-                        </MudSelect>
-                    </div>
-                </div>
+                <ShowListProduct Shoes="_shoes.Where(_filterCondition).ToList()" 
+                                 PageSize="12" Title="TẤT CẢ SẢN PHẨM" 
+                                 IsShowSortControl="true" IsLoading="_isLoading"/>
             </MudItem>
-            <MudItem xs="12">
-                <MudGrid>
-                    @foreach (var item in _shoes.OrderByDirection(_sortDirection, _keySelector).ToList())
-                    {
-                        <ProductItem Shoe="@item" />
-                    }
-                </MudGrid>
-            </MudItem>
+           
         </MudGrid>
     </MudItem>
 </MudGrid>
 
 @code {
+   
     List<Shoe> _shoes = new();
+    List<string> _listTrademarksChecked = new();
+    List<string> _listSizesChecked = new();
+
     ExpressionStarter<Shoe> _filterCondition = PredicateBuilder.New<Shoe>();
     SortDirection _sortDirection;
     Func<Shoe, object> _keySelector = x => x.Id;
 
+    bool _isLoading;
+
     protected override async Task OnInitializedAsync()
     {
+        _isLoading = true;
         _shoes = await ShoeRepository.GetAllLoadingAsync();
+
+        _filterCondition.Or(x => true);
+        _isLoading = false;
+    }
+
+    void HandleFilterChanged(List<ExpressionStarter<Shoe>> expressions)
+    {
+        _filterCondition = PredicateBuilder.New<Shoe>();
+        foreach (var item in expressions)
+        {
+            _filterCondition.Or(item);
+        }
     }
     void HandleSortChange(string value)
     {
@@ -72,6 +75,10 @@
                 _keySelector = x => x.Title;
                 break;
             case "Mới nhất":
+                _sortDirection = SortDirection.Descending;
+                _keySelector = x => x.Id;
+                break;
+            default:
                 _sortDirection = SortDirection.Descending;
                 _keySelector = x => x.Id;
                 break;

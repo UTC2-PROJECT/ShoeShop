@@ -1,0 +1,160 @@
+﻿@using System.IO;
+@inject UserRepository UserRepository
+@inject UserManagerService UserManagerService
+
+<MudDialog>
+    <DialogContent>
+        <MudForm Model="User" @ref="_form">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField Label="Tên người dùng" T="string" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                  @bind-Value="User.Name" Validation="@(UserValidation.ValidateValue)"
+                                  For="() => User.Name" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Email" T="string" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                  @bind-Value="User.Email" Validation="@(UserValidation.ValidateValue)"
+                                  For="() => User.Email" Error="@(!IsValidEmail(User.Email))" />
+                    @if (!IsValidEmail(User.Email))
+                    {
+                        <p style="color: red; font-size: .75rem;" class="my-2 ml-2">Email đã tồn tại</p>
+                    }
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Mật khẩu" T="string" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                  @bind-Value="User.Password"
+                                  Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon"
+                                  InputType="@_passwordInput" OnAdornmentClick="ButtonTestclick"
+                                  For="() => User.Password" Validation="@(UserValidation.ValidateValue)" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField Label="Nhập lại mật khẩu" T="string" Variant="Variant.Outlined"
+                                  Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon"
+                                  InputType="@_passwordInput" OnAdornmentClick="ButtonTestclick"
+                                  Margin="Margin.Dense" @bind-Value="User.RePassword" 
+                                  Validation="@(UserValidation.ValidateValue)" For="() => User.RePassword" />
+
+                </MudItem>
+                <MudItem xs="12">
+                    <MudSelect Label="Phân quyền" T="string" SelectedValues="User.Roles" Variant="Variant.Outlined"
+                               Dense="true" OffsetY="true" SelectedValuesChanged="(e) => User.Roles = e.ToList()"
+                               MultiSelection="true" Margin="Margin.Dense" Clearable="true" Error="@(User.Roles.Count <= 0)">
+                        <MudSelectItem Value="@("Admin")" />
+                        <MudSelectItem Value="@("User")" />
+                    </MudSelect>
+                    @if (User.Roles.Count <= 0)
+                    {
+                        <p style="color: red; font-size: .75rem;" class="my-2 ml-2">Chưa chọn quyền</p>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Huỷ</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Xong</MudButton>
+        <MudOverlay Visible="_isLoading" LightBackground="true" Absolute="true">
+        </MudOverlay>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public User User { get; set; }
+    [Parameter] public bool IsEdit { get; set; }
+
+    List<string> _currentRoles = new();
+
+    MudForm _form;
+    UserValidation UserValidation = new();
+    InputType _passwordInput = InputType.Password;
+
+    string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+    string _oldEmail;
+
+    bool _isLoading;
+    bool _isPasswordShow;
+
+    protected override void OnInitialized()
+    {
+        if (IsEdit)
+        {
+            _oldEmail = User.Email;
+            _currentRoles = User.Roles;
+        }
+    }
+
+    void Cancel() => MudDialog.Cancel();
+
+    async Task Submit()
+    {
+        await _form.Validate();
+        if (_form.IsValid && User.Roles.Count > 0 && IsValidEmail(User.Email))
+        {
+            if (!IsEdit)
+            {
+                await AddUser(User);
+            }
+            else
+            {
+                await UpdateUser(User);
+            }
+            MudDialog.Close(DialogResult.Ok(User));
+        }
+    }
+
+    async Task AddUser(User user)
+    {
+        await UserRepository.AddAsync(user);
+        await UserManagerService.CreateIdentityUserAsync(user);
+    }
+
+    async Task UpdateUser(User user)
+    {
+        await UserRepository.UpdateAsync(user);
+        await UserManagerService.UpdateIdentityUserAsync(user, _currentRoles);
+    }
+
+    bool IsValidEmail(string email)
+    {
+        bool result = true;
+        if (IsEdit)
+        {
+            if (IsEdit && User.Email != _oldEmail && CheckContainEmail(email))
+            {
+                result = false;
+            }
+        }
+        else
+        {
+            if (CheckContainEmail(email))
+            {
+                result = false;
+            }
+        }
+
+        return result;
+    }
+
+    bool CheckContainEmail(string email)
+    {
+        var userExisted = UserRepository.GetFilter(x => x.Email == email);
+        return userExisted != null && userExisted.Count > 0;
+    }
+
+    void ButtonTestclick()
+    {
+        @if (_isPasswordShow)
+        {
+            _isPasswordShow = false;
+            _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+            _passwordInput = InputType.Password;
+        }
+        else
+        {
+            _isPasswordShow = true;
+            _passwordInputIcon = Icons.Material.Filled.Visibility;
+            _passwordInput = InputType.Text;
+        }
+    }
+}

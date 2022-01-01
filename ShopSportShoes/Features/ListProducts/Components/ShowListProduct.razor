@@ -1,0 +1,101 @@
+﻿<MudGrid>
+    <MudItem xs="12">
+        <div class="d-flex align-items-center">
+            <h1 class="pa-0 ma-0">@Title</h1>
+            <MudSpacer />
+            @if (IsShowSortControl)
+            {
+                <div style="width:200px;">
+                    <MudSelect T="string" Variant="Variant.Outlined" Margin="Margin.Dense"
+                               Dense="true" Label="Sắp xếp" OffsetY="true"
+                               Clearable="true"
+                               ValueChanged="(e) => HandleSortChange(e)">
+                        <MudSelectItem Value="@("Giá tăng dần")" />
+                        <MudSelectItem Value="@("Giá giảm dần")" />
+                        <MudSelectItem Value="@("Tên A-Z")" />
+                        <MudSelectItem Value="@("Tên Z-A")" />
+                        <MudSelectItem Value="@("Mới nhất")" />
+                    </MudSelect>
+                </div>
+            }
+        </div>
+    </MudItem>
+    <MudItem xs="12">
+        <MudDivider DividerType="DividerType.FullWidth" />
+    </MudItem>
+    <MudItem xs="12">
+        <MudGrid>
+            @foreach (var item in Shoes.Skip(_pageSelected * PageSize).Take(PageSize).OrderByDirection(_sortDirection, _keySelector).ToList())
+            {
+                <MudItem xs="3">
+                    <ProductItem Shoe="@item" />
+                </MudItem>
+            }
+
+            @if (IsLoading)
+            {
+                @for (int i = 0; i < PageSize; i++)
+                {
+                    <MudItem xs="12" md="3" lg="3">
+                        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="300px" />
+                        <MudSkeleton />
+                        <MudSkeleton />
+                        <MudSkeleton />
+                    </MudItem>
+                }
+            }
+        </MudGrid>
+    </MudItem>
+    <MudItem xs="12">
+        <div class="d-flex justify-content-center">
+            <MudPagination Color="Color.Primary" Count="@(_totalPages)" Selected="@(_pageSelected + 1)" SelectedChanged="(e) => _pageSelected = --e" />
+        </div>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public List<Shoe> Shoes { get; set; }
+    [Parameter] public string Title { get; set; }
+    [Parameter] public int PageSize { get; set; }
+    [Parameter] public bool IsShowSortControl { get; set; }
+    [Parameter] public bool IsLoading { get; set; }
+
+    SortDirection _sortDirection = SortDirection.Descending;
+    Func<Shoe, object> _keySelector = x => x.Id;
+
+    int _totalPages => Shoes.Count % PageSize == 0 ? Shoes.Count / PageSize : (Shoes.Count % PageSize > 0 ? (Shoes.Count / PageSize + 1) : 0);
+    int _pageSelected = 0;
+
+    bool _isLoading;
+
+    void HandleSortChange(string value)
+    {
+        switch (value)
+        {
+            case "Giá tăng dần":
+                _sortDirection = SortDirection.Ascending;
+                _keySelector = x => x.Price;
+                break;
+            case "Giá giảm dần":
+                _sortDirection = SortDirection.Descending;
+                _keySelector = x => x.Price;
+                break;
+            case "Tên A-Z":
+                _sortDirection = SortDirection.Ascending;
+                _keySelector = x => x.Title;
+                break;
+            case "Tên Z-A":
+                _sortDirection = SortDirection.Descending;
+                _keySelector = x => x.Title;
+                break;
+            case "Mới nhất":
+                _sortDirection = SortDirection.Descending;
+                _keySelector = x => x.Id;
+                break;
+            default:
+                _sortDirection = SortDirection.Descending;
+                _keySelector = x => x.Id;
+                break;
+        }
+    }
+}

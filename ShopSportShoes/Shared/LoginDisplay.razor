@@ -4,7 +4,7 @@
         <MudLink Href="Identity/Account/Logout" Underline="Underline.None" Class="mx-3">Đăng xuất</MudLink>
         @if (!LockCart)
         {
-            <MudBadge Content="100" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
+            <MudBadge Content="@(UserCascaded?.OrdersNavigation?.Count ?? 0)" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
                 <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
             </MudBadge>
         }
@@ -26,7 +26,7 @@
         </MudMenu>
         @if (!LockCart)
         {
-            <MudBadge Content="100" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
+            <MudBadge Content="0" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
                 <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
             </MudBadge>
         }
@@ -34,5 +34,8 @@
 </AuthorizeView>
 
 @code{
+    [CascadingParameter] public User UserCascaded { get; set; }
     [Parameter] public bool LockCart { get; set; }
+
+
 }

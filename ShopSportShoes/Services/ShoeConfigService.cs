@@ -59,6 +59,7 @@ namespace ShopSportShoes.Services
     public class ShoeConfig
     {
         public List<string> Trademarks { get; set; }
+        public List<string> PriceRanges { get; set; }
 
         public void SetValueByPropName(string propName, object data)
         {

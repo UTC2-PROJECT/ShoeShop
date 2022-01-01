@@ -244,7 +244,7 @@
             if (IsEdit)
             {
                 // Update 
-                if (Shoe.ImagesNavigation.Count > 0 && _sizesSeleted.Count > 0)
+                if (Shoe.ImagesNavigation.Count > 0 || _sizesSeleted.Count > 0)
                 {
                     _isLoading = true;
                     shoe = await UpdateShoe();

@@ -1,0 +1,116 @@
+﻿@inject ShoeConfigService ShoeConfigService
+@inject SizeRepository SizeRepository
+@using LinqKit
+
+<MudExpansionPanels MultiExpansion="true" Elevation="0" DisableBorders="true">
+    <MudExpansionPanel @bind-IsExpanded="@_isPriceRangesOpen">
+        <TitleContent>
+            <strong>Khoảng giá</strong>
+        </TitleContent>
+        <ChildContent>
+            <MudRadioGroup @bind-SelectedOption="@_priceRangeSelected">
+                @foreach (var item in _priceRanges)
+                {
+                    <MudRadio Color="Color.Primary" Option="@(item)">@item</MudRadio>
+                }
+            </MudRadioGroup>
+        </ChildContent>
+    </MudExpansionPanel>
+    <MudExpansionPanel @bind-IsExpanded="@_isTrademarksOpen">
+        <TitleContent>
+            <strong>Thương hiệu</strong>
+        </TitleContent>
+        <ChildContent>
+            @foreach (var item in _trademarks)
+            {
+                <div class="d-flex"><MudCheckBox T="bool" CheckedChanged="@((e) => HandleChecked(e , item, "trademark"))" Label="@item" Color="Color.Primary"></MudCheckBox></div>
+            }
+        </ChildContent>
+    </MudExpansionPanel>
+    <MudExpansionPanel @bind-IsExpanded="@_isSizeNamesOpen">
+        <TitleContent>
+            <strong>Sizes</strong>
+        </TitleContent>
+        <ChildContent>
+            @foreach (var item in _sizeNames)
+            {
+                <div class="d-flex"><MudCheckBox T="bool" CheckedChanged="@((e) => HandleChecked(e , item, "size"))" Label="@item" Color="Color.Primary"></MudCheckBox></div>
+            }
+        </ChildContent>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@code {
+
+    [Parameter] public EventCallback<List<ExpressionStarter<Shoe>>> FilterChanged { get; set; }
+
+    List<ExpressionStarter<Shoe>> _listConditions = new();
+
+    List<string> _priceRanges = new();
+    List<string> _trademarks = new();
+    List<string> _sizeNames = new();
+    List<string> _listTrademarksChecked = new();
+    List<string> _listSizesChecked = new();
+
+    string _priceRangeSelected;
+
+    bool _isPriceRangesOpen = true;
+    bool _isTrademarksOpen = true;
+    bool _isSizeNamesOpen = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var sizes = await SizeRepository.GetAllAsync();
+        _sizeNames = sizes.Select(x => x.SizeName).ToList();
+        _trademarks = ShoeConfigService.GetAll().Trademarks;
+        _priceRanges = ShoeConfigService.GetAll().PriceRanges;
+    }
+
+    async Task HandleChecked(bool value, string item, string label)
+    {
+        _listConditions = new();
+        if (value)
+        {
+            if (label == "trademark")
+            {
+                if(!_listTrademarksChecked.Any(x => x == item))
+                    _listTrademarksChecked.Add(item);
+            }
+            else
+            {
+                if (!_listSizesChecked.Any(x => x == item))
+                    _listSizesChecked.Add(item);
+            }
+        }
+        else
+        {
+            if (label == "trademark")
+            {
+                _listTrademarksChecked.RemoveAll(x => x == item);
+            }
+            else
+            {
+                _listTrademarksChecked.RemoveAll(x => x == item);
+            }
+        }
+        if (!_listTrademarksChecked.Any() && !_listSizesChecked.Any())
+        {
+            _listConditions.Add(PredicateBuilder.New<Shoe>(x => true));
+        }
+        else
+        {
+            if (_listTrademarksChecked.Any())
+            {
+                _listConditions.Add(PredicateBuilder.New<Shoe>(x => _listTrademarksChecked.Any(c => c == x.Trademark)));
+            }
+
+            if (_listSizesChecked.Any())
+            {
+                _listConditions.Add(PredicateBuilder.New<Shoe>(x => _listSizesChecked.All(s => x.ShoeSizesNavigation.Any(c => c.SizeNavigation.SizeName == s))));
+            }
+        }
+
+        await FilterChanged.InvokeAsync(_listConditions);
+    }
+
+}

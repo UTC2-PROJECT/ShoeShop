@@ -1,16 +1,50 @@
-﻿
+﻿@inject ShoeRepository ShoeRepository
+@inject NavigationManager NavigationManager
 
 <MudGrid Style="align-items:center">
     <MudItem xs="3">
-        <img src="./images/logos/logo.jpg" style="object-fit: contain; width: 100%; padding: 20px 50px;"/>
+        <MudLink Href="/">
+            <img src="./images/logos/logo.jpg" style="object-fit: contain; width: 100%; padding: 20px 50px;" />
+        </MudLink>
     </MudItem>
     <MudItem xs="6">
-        <MudAutocomplete T="string" Placeholder="Tìm kiếm sản phẩm của bạn..." SearchFunc="ContentAutoSearch" Variant="Variant.Outlined"
-                         AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
-                         Margin="Margin.Dense"
-                         Dense="true">
-        </MudAutocomplete>
-
+        <div style="width:100%; position:relative;">
+            <MudTextField T="string" Placeholder="Tìm kiếm sản phẩm của bạn..." Variant="Variant.Outlined"
+                          AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" Adornment="Adornment.End"
+                          OnAdornmentClick="HandleSearchClick"
+                          Margin="Margin.Dense" FullWidth="true" @bind-Value="_textSearch" @bind-Text="_textSearch"
+                          DebounceInterval="1000">
+            </MudTextField>
+            <MudCard Elevation="25" style="position: absolute; top: calc(100% + 10px); left: 0; width: 100%; z-index: 9999;" Class="@(_display)">
+                <div class="w-100 pa-2">
+                    <span class="font-weight-bold" style="color:#b7b7b7;">Kết quả tìm kiếm cho <strong class="font-weight-bold" style="color:red;">"@(_textSearch)"</strong></span>
+                </div>
+                <div class="w-100 d-flex pa-1 justify-content-end" style="background: #ebebeb">
+                    <span class="font-weight-bold" style="color:#b7b7b7; white-space:nowrap; font-size:.75rem;">SẢN PHẨM</span>
+                </div>
+                @foreach (var item in _listSearched.Where(x => $"{x.Title} {x.Trademark} {x.ShoeCatalogNavigation.Name}".Contains(_textSearch, StringComparison.OrdinalIgnoreCase))
+                                                 .Take(3)
+                                                 .ToList())
+                {
+                    <MudLink Href="@($"/sanpham/{item.Id}")" Underline="Underline.None">
+                        <div class="w-100 d-flex align-items-center flex-nowrap pa-2 result-search-item ">
+                            <MudCard style="width: 80px; height: 80px;" class="d-flex align-items-center justify-content-end mr-3">
+                                <img src="@item?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink" style="object-fit:contain; width:100%;" />
+                            </MudCard>
+                            <div class="w-100 d-flex flex-wrap align-items-center justify-content-start" Style="height:80px">
+                                <p class="ma-0 w-100 font-weight-bold" style="color:red;"><MudHighlighter Text="@item.Title" HighlightedText="@_textSearch" /></p>
+                                <p class="ma-0 w-100" style="color: #b7b7b7"><MudHighlighter Text="@($"Loại: {item?.ShoeCatalogNavigation?.Name} | Thương hiệu: {@item?.Trademark}")" HighlightedText="@_textSearch" /></p>
+                                <p class="ma-0 w-100 font-weight-bold" style="color: #b90b0b;">@string.Format("{0:#,##0} đ", item.Price)</p>
+                            </div>
+                        </div>
+                    </MudLink>
+                    <MudDivider />
+                }
+                <div class="w-100 d-flex pa-1 justify-content-center">
+                    <MudLink Href="@($"/sanpham/{_textSearch}")" @onclick="() => _textSearch = string.Empty" class="font-weight-bold" style="color:#b7b7b7; white-space:nowrap; font-size:.75rem;">Hiển thị sản phẩm chứa <span style="color:red;">@_textSearch</span> </MudLink>
+                </div>
+            </MudCard>
+        </div>
     </MudItem>
     <MudItem xs="3">
         <div style="display:flex; justify-content:center; align-items:center;">
@@ -20,8 +54,20 @@
 </MudGrid>
 
 @code {
-    private Task<IEnumerable<string>> ContentAutoSearch(string value)
+
+    List<Shoe> _listSearched = new();
+
+    string _textSearch = "";
+    string _display => string.IsNullOrEmpty(_textSearch) ? "d-none" : "d-block";
+
+    protected override async Task OnInitializedAsync()
     {
-        return null;
+        _listSearched = await ShoeRepository.GetAllLoadingAsync();
+    }
+
+    void HandleSearchClick()
+    {
+        NavigationManager.NavigateTo($"/sanpham/{_textSearch}");
+        _textSearch = "";
     }
 }

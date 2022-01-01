@@ -10,7 +10,7 @@
         <ShoeInformationDetail Shoe="_shoe"/>
     </MudItem>
     <MudItem xs="12"> 
-        <ListNewRelease Title="SẢM PHẨM LIÊN QUAN" Shoes="_shoes.Take(4).ToList()" NumberOfItem="4"/>
+        <ListNewRelease Title="SẢM PHẨM LIÊN QUAN" Shoes="_shoes.Take(6).ToList()" NumberOfItem="6"/>
     </MudItem>
 </MudGrid>
 
@@ -24,6 +24,11 @@
     protected override async Task OnInitializedAsync()
     {
         _shoe = await ShoeRepository.GetByIdDetailsAsync(ShoeId);
-        _shoes = await ShoeRepository.GetFilterCustomizeAsync(x => x.Trademark == _shoe.Trademark);
+        _shoes = await ShoeRepository.GetFilterCustomizeAsync(x => x.Trademark == _shoe.Trademark || x.ShoeCatalogNavigation.Name == _shoe.ShoeCatalogNavigation.Name);
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        _shoe = await ShoeRepository.GetByIdDetailsAsync(ShoeId);
+        _shoes = await ShoeRepository.GetFilterCustomizeAsync(x => x.Trademark == _shoe.Trademark || x.ShoeCatalogNavigation.Name == _shoe.ShoeCatalogNavigation.Name);
     }
 }

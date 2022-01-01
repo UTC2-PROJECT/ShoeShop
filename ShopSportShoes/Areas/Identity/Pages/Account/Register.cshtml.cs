@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using ShopSportShoes.Models;
+using ShopSportShoes.Repositories;
 using ShopSportShoes.Repositories.Interfaces;
 
 namespace ShopSportShoes.Areas.Identity.Pages.Account
@@ -24,13 +25,13 @@ namespace ShopSportShoes.Areas.Identity.Pages.Account
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IBaseRepository<User> _userRepository;
+        private readonly UserRepository _userRepository;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IBaseRepository<User> userRepository)
+            UserRepository userRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;

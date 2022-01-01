@@ -51,3 +51,9 @@ a, .btn-link {
     img{
         cursor:pointer;
     }
+
+
+.result-search-item:hover {
+    cursor: pointer;
+    background: #ebebeb;
+}
