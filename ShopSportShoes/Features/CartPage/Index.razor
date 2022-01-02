@@ -1,5 +1,154 @@
 ﻿@page "/nguoidung/giohang"
+@inject UserRepository UserRepository
+@inject OrderDetailsRepository OrderDetailsRepository
+@inject OrderRealtimeService OrderRealtimeService
+@inject NavigationManager NavigationManager
+
+<style>
+    .control-quantity {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .control-quantity:hover {
+            background: #eaeaea;
+        }
+</style>
+
+@if (_ordersDetails.Count > 0)
+{
+    <MudGrid>
+        <MudItem xs="12" md="9" lg="9">
+            <MudSimpleTable Bordered="true" FixedHeader="true" Hover="true" Dense="true"
+                            Style="max-height:55vh; overflow-x:hidden; overflow-y:scroll; width:100%;">
+                <colGroup>
+                    <col style="text-align:center;" />
+                    <col style="width:45%" />
+                    <col style="text-align:center;" />
+                    <col style="width:19%" />
+                    <col style="text-align:center;" />
+                    <col style="text-align:center;" />
+                </colGroup>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Sản phẩm</th>
+                        <th>Size</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var context in _ordersDetails)
+                    {
+                        <tr>
+                            <td>@(_ordersDetails.FindIndex(x => x.Id == context.Id) + 1)</td>
+                            <td>
+                                <a href="@($"/sanpham/{context.ShoeId}")" style="text-decoration:none;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div style="height:100px; width:100px;" class="d-flex align-items-center justify-content-center">
+                                            <img style="width:100%; object-fit:contain;" src="@context?.ShoeNavigation?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink" />
+                                        </div>
+                                        <div class="d-flex flex-column justify-content-center align-items-start" style="height:100px;">
+                                            <p class="ma-0" style="font-weight:400; font-size:1.2rem;">@context?.ShoeNavigation?.Title</p>
+                                            <p class="ma-0 d-flex align-items-center" style="white-space:nowrap">Loại: @context?.ShoeNavigation?.ShoeCatalogNavigation?.Name | Thương hiệu:@context?.ShoeNavigation?.Trademark </p>
+                                            <p class="ma-0 mt-2 font-weight-bold" style="color:red;">@string.Format("{0:#,##0} đ", @context?.ShoeNavigation?.Price)</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </td>
+                            <td>@context.Size</td>
+                            <td>
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div class="px-1 control-quantity" style="cursor: pointer; border: 1px solid #333;"
+                                         @onclick="@(() => {
+                                         if (context.Quantity > 1)
+                                         {
+                                             --context.Quantity;
+                                             context.IntoMoney -= context.ShoeNavigation.Price;
+                                         }
+
+                                     })">
+                                        -1
+                                    </div>
+                                    <div style="font-size:1.5rem; width: 50px;" class="px-3 d-flex justify-content-center align-items-center">
+                                        @context.Quantity
+                                    </div>
+                                    <div class="px-1 control-quantity" style="cursor: pointer; border: 1px solid #333;"
+                                         @onclick="() => {
+                                       ++context.Quantity;
+                                        context.IntoMoney += context.ShoeNavigation.Price;
+                                   }">
+                                        +1
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@string.Format("{0:#,##0} đ", @context.IntoMoney)</td>
+                            <td>
+                                <MudTooltip Text="Xoá">
+                                    <MudIconButton Icon="@Icons.Filled.Delete" Color="Color.Error" Size="MudBlazor.Size.Small"
+                                                   OnClick="() => DeleteOrderDetails(context)"></MudIconButton>
+                                </MudTooltip>
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
+            <div class="w-100 d-flex justify-content-center align-items-center">
+                <MudLink Href="/sanpham/tatca" Underline="Underline.None">
+                    <MudButton Variant="Variant.Filled" DisableElevation="true"
+                               Color="Color.Primary" Class="my-2">Tiếp tục mua hàng</MudButton>
+                </MudLink>
+            </div>
+        </MudItem>
+        <MudItem xs="12" md="3" lg="3">
+            <MudCard Class="pa-5">
+                <div class="d-flex align-items-center mb-5">
+                    <span style="font-weight: 500;">Thành tiền</span>
+                    <MudSpacer />
+                    <span style=" color: #d72525; font-weight: 500; font-size: 1.5rem;">@string.Format("{0:#,##0} đ", _totalPrice)</span>
+                </div>
+                <MudButton FullWidth="true" Variant="Variant.Filled" DisableElevation="true"
+                           Color="Color.Primary" Class="mt-5" OnClick="HandleCheckoutClick">Thanh toán</MudButton>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
+else
+{
+    <MudCard Class="pa-5">
+        <h2 style="font-weight: 300;">Giỏ hàng đang trống</h2>
+        <MudButton DisableElevation="true" FullWidth="false" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo("/sanpham/tatca"))">Tiếp tục mua hàng</MudButton>
+    </MudCard>
+}
+
 
 @code {
-    [CascadingParameter] public User UserCascaded { get; set; }
+    [CascadingParameter(Name = "UserCascaded")] public User UserCascaded { get; set; }
+    List<OrderDetails> _ordersDetails = new();
+
+    double _totalPrice => _ordersDetails.Sum(x => x.IntoMoney);
+
+    protected override void OnInitialized()
+    {
+        var user = UserRepository.GetUserOrdersById(UserCascaded.Id);
+        _ordersDetails = user.OrdersNavigation.SelectMany(x => x.OrdersDetails).ToList();
+    }
+
+    async Task DeleteOrderDetails(OrderDetails orderDetails)
+    {
+        await OrderDetailsRepository.DeleteAsync(orderDetails.Id);
+        _ordersDetails.RemoveAll(x => x.Id == orderDetails.Id);
+        OrderRealtimeService.UpdateCart();
+    }
+
+    void HandleCheckoutClick()
+    {
+        NavigationManager.NavigateTo("/checkout");
+    }
 }

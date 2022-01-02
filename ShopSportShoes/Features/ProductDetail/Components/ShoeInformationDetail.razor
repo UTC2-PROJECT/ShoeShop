@@ -1,4 +1,9 @@
-﻿
+﻿@inject OrderRepository OrderRepository
+@inject OrderDetailsRepository OrderDetailsRepository
+@inject OrderRealtimeService OrderRealtimeService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
 <MudGrid>
     <MudItem xs="5">
         <div class="w-100">
@@ -34,7 +39,7 @@
                     <MudChipSet @bind-SelectedChip="_chipSizeSeleted" Filter="true">
                         @foreach (var item in Shoe.ShoeSizesNavigation.Select(x => x.SizeNavigation.SizeName))
                         {
-                            <MudChip Color="Color.Dark" Style="font-weight:bold;">@item</MudChip>
+                            <MudChip Text="@item" Color="Color.Dark" Style="font-weight:bold;">@item</MudChip>
                         }
                     </MudChipSet>
 
@@ -57,9 +62,11 @@
 
             <div class="d-flex align-items-center mb-3">
                 <MudButton Color="Color.Primary" FullWidth="true"
-                           Variant="Variant.Filled">MUA NGAY</MudButton>
+                           Variant="Variant.Filled"
+                           OnClick="@(() => NavigationManager.NavigateTo("/checkout"))">MUA NGAY</MudButton>
                 <MudButton Color="Color.Primary" FullWidth="true"
-                           Variant="Variant.Outlined" Class="mx-2">THÊM VÀO GIỎ</MudButton>
+                           Variant="Variant.Outlined" Class="mx-2"
+                           OnClick="AddToCart">THÊM VÀO GIỎ</MudButton>
             </div>
 
         </MudCard>
@@ -80,6 +87,7 @@
 <ImageOverlay @bind-IsOpen="_isOverlay" @bind-ImageSource="_imgSrcOveray" />
 
 @code {
+    [CascadingParameter(Name = "UserCascaded")] public User UserCascaded { get; set; }
     [Parameter] public Shoe Shoe { get; set; }
 
     MudChip _chipSizeSeleted;
@@ -90,6 +98,38 @@
     bool _isOverlay;
 
     int _quantity = 1;
+
+    async Task AddToCart()
+    {
+        if (_chipSizeSeleted != null)
+        {
+            Order order = new()
+            {
+                DateCreated = DateTime.Now,
+                UserId = UserCascaded.Id
+            };
+            var orderAdded = await OrderRepository.AddAsync(order);
+
+            OrderDetails orderDetails = new()
+            {
+                ShoeId = Shoe.Id,
+                OrderId = orderAdded.Id,
+                IntoMoney = Shoe.Price * _quantity,
+                Quantity = _quantity,
+                Size = _chipSizeSeleted.Text
+            };
+            await OrderDetailsRepository.AddAsync(orderDetails);
+
+            orderAdded.TotalPrice = orderDetails.IntoMoney;
+            await OrderRepository.UpdateAsync(orderAdded);
+            OrderRealtimeService.UpdateCart();
+            Snackbar.Add("Đã thêm vào giỏ hàng của bạn", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Chưa chọn size giày",Severity.Info);
+        }
+    }
 
     void SwitchImage(string result)
     {

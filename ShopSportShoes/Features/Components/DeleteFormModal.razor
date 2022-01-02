@@ -1,0 +1,13 @@
+﻿<MudDialog>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Huỷ</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Xoá</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialogInstance { get; set; }
+
+    void Cancel() => MudDialogInstance.Cancel();
+    void Submit() => MudDialogInstance.Close(DialogResult.Ok(true));
+}

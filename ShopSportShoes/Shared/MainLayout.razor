@@ -6,21 +6,25 @@
 
 @if (!NavigationManager.Uri.Contains("admin"))
 {
-    @* HEADER *@
-    <HeaderPage />
-    <CascadingValue Value="_uriCascaded">
-        <NavMenu />
-    </CascadingValue>
-    <br />
-
-    @* BODY *@
-    <MudContainer>
+    <CascadingValue Value="_userCascaded" Name="UserCascaded">
         <CascadingValue Value="_uriCascaded">
-            @Body
+            @* HEADER *@
+            <HeaderPage />
+            <CascadingValue Value="_uriCascaded">
+                <NavMenu />
+            </CascadingValue>
+            <br />
+
+            @* BODY *@
+            <MudContainer>
+
+                @Body
+
+            </MudContainer>
+            @* FOOTER *@
+            <Footer />
         </CascadingValue>
-    </MudContainer>
-    @* FOOTER *@
-    <Footer />
+    </CascadingValue>
 }
 else
 {

@@ -57,3 +57,21 @@ a, .btn-link {
     cursor: pointer;
     background: #ebebeb;
 }
+
+@keyframes rotate {
+    from {
+        transform: rotate(-360deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.troll-game {
+    height:100px;
+    animation-name: rotate;
+    animation-duration: .5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}

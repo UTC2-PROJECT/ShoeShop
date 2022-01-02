@@ -28,5 +28,18 @@ namespace ShopSportShoes.Repositories
             var context = _contextFactory.CreateDbContext();
             return context.Users.Where(filter).ToList();
         }
+
+        public User GetUserOrdersById(int id)
+        {
+            var context = _contextFactory.CreateDbContext();
+            return context.Users.Where(x => x.Id == id)
+                                    .Include(x => x.OrdersNavigation)
+                                        .ThenInclude(x => x.OrdersDetails)
+                                            .ThenInclude(x => x.ShoeNavigation.ShoeCatalogNavigation)
+                                    .Include(x => x.OrdersNavigation)
+                                        .ThenInclude(x => x.OrdersDetails)
+                                            .ThenInclude(x => x.ShoeNavigation.ImagesNavigation)
+                                    .FirstOrDefault();
+        }
     }
 }

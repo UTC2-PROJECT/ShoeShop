@@ -78,12 +78,18 @@ namespace ShopSportShoes
             services.AddSingleton<ShoeConfigService>();
             services.AddScoped<UserManagerService>();
 
+            // Realtime service
+            services.AddScoped<OrderRealtimeService>();
+
+            // Repository
             services.AddSingleton<ShoeRepository>();
             services.AddSingleton<UserRepository>();
             services.AddSingleton<SizeRepository>();
             services.AddSingleton<ShoeSizeRepository>();
             services.AddSingleton<ImageRepository>();
             services.AddSingleton<ShoeCatalogRepository>();
+            services.AddSingleton<OrderRepository>();
+            services.AddSingleton<OrderDetailsRepository>();
 
         }
 

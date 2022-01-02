@@ -1,0 +1,56 @@
+﻿@page "/troll";
+@attribute [Authorize]
+@inject ISnackbar Snackbar
+
+<h1>
+    Thông tin giao hàng
+</h1>
+
+<AuthorizeView>
+
+</AuthorizeView>
+<div style="@_text width:300px;" @onmousemove="OnMouseUp" class="@_class">
+    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+               OnClick="@(() => {
+                              Snackbar.Add("Không có gì lêu lêu ^_^", Severity.Success);
+                              _isMove = true;
+                          })">Click để nhận quà</MudButton>
+</div>
+
+@*<MudGrid>
+        @_text
+    </MudGrid>*@
+
+<style>
+</style>
+
+@code {
+    string _text => $"position:absolute; top:{_top}px; left:{_left}px; z-index:9999;";
+    string _class => $"pa-5 d-flex justify-content-center align-content-center {(_count >= 3 && _isMove ? "troll-game" : "")}";
+
+    bool _isMove;
+
+    int _count = 0;
+    int _top = 0;
+    int _left = 0;
+
+    Random Random = new();
+
+    void OnMouseUp(MouseEventArgs e)
+    {
+        if (_count == 20)
+        {
+            _top = 500;
+            _left = 500;
+            _isMove = false;
+            return;
+        }
+
+        _top = Random.Next(0, 700);
+        _left = Random.Next(0, 1000);
+        _isMove = true;
+
+        _count++;
+        StateHasChanged();
+    }
+}

@@ -1,5 +1,8 @@
 ﻿@inject ShoeRepository ShoeRepository
 @inject NavigationManager NavigationManager
+@inject UserRepository UserRepository
+@inject OrderRealtimeService OrderRealtimeService
+@implements IDisposable
 
 <MudGrid Style="align-items:center">
     <MudItem xs="3">
@@ -11,11 +14,12 @@
         <div style="width:100%; position:relative;">
             <MudTextField T="string" Placeholder="Tìm kiếm sản phẩm của bạn..." Variant="Variant.Outlined"
                           AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" Adornment="Adornment.End"
-                          OnAdornmentClick="HandleSearchClick"
+                          OnAdornmentClick="HandleSearchClick" @onfocusout="() => _isShowSearch = false" @onfocusin="() => _isShowSearch = true"
                           Margin="Margin.Dense" FullWidth="true" @bind-Value="_textSearch" @bind-Text="_textSearch"
                           DebounceInterval="1000">
             </MudTextField>
-            <MudCard Elevation="25" style="position: absolute; top: calc(100% + 10px); left: 0; width: 100%; z-index: 9999;" Class="@(_display)">
+            <MudCard @onfocusin="() => _isShowSearch = true" @onfocusout="() => _isShowSearch = false" Elevation="25"
+                     style="position: absolute; top: calc(100% + 10px); left: 0; width: 100%; z-index: 9999;" Class="@(_display)">
                 <div class="w-100 pa-2">
                     <span class="font-weight-bold" style="color:#b7b7b7;">Kết quả tìm kiếm cho <strong class="font-weight-bold" style="color:red;">"@(_textSearch)"</strong></span>
                 </div>
@@ -23,10 +27,10 @@
                     <span class="font-weight-bold" style="color:#b7b7b7; white-space:nowrap; font-size:.75rem;">SẢN PHẨM</span>
                 </div>
                 @foreach (var item in _listSearched.Where(x => $"{x.Title} {x.Trademark} {x.ShoeCatalogNavigation.Name}".Contains(_textSearch, StringComparison.OrdinalIgnoreCase))
-                                                 .Take(3)
-                                                 .ToList())
+                                           .Take(3)
+                                           .ToList())
                 {
-                    <MudLink Href="@($"/sanpham/{item.Id}")" Underline="Underline.None">
+                    <MudLink Href="@($"/sanpham/{item.Id}")" @onclick="() => _textSearch = string.Empty" Underline="Underline.None">
                         <div class="w-100 d-flex align-items-center flex-nowrap pa-2 result-search-item ">
                             <MudCard style="width: 80px; height: 80px;" class="d-flex align-items-center justify-content-end mr-3">
                                 <img src="@item?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink" style="object-fit:contain; width:100%;" />
@@ -49,20 +53,65 @@
     <MudItem xs="3">
         <div style="display:flex; justify-content:center; align-items:center;">
             <LoginDisplay />
+            <AuthorizeView>
+                <Authorized>
+                    <MudTooltip Text="Xem giỏ hàng">
+                        <MudLink Href="/nguoidung/giohang" Underline="Underline.None">
+                            <MudBadge Content="@(_user?.OrdersNavigation?.Where(x => !x.IsPaid && !x.IsCanceled)
+                                     .SelectMany(x => x.OrdersDetails).Count() ?? 0)"
+                                      Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
+                                <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
+                            </MudBadge>
+                        </MudLink>
+                    </MudTooltip>
+                </Authorized>
+                <NotAuthorized>
+                    <MudBadge Content="@(0)"
+                              Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
+                        <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
+                    </MudBadge>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
     </MudItem>
 </MudGrid>
 
 @code {
 
+    [CascadingParameter(Name = "UserCascaded")] private User UserCascaded { get; set; }
+
     List<Shoe> _listSearched = new();
 
+    User _user = new();
+
+    int _numberOfItem;
+
+    bool _isShowSearch;
+
     string _textSearch = "";
-    string _display => string.IsNullOrEmpty(_textSearch) ? "d-none" : "d-block";
+    string _display => string.IsNullOrEmpty(_textSearch) || !_isShowSearch ? "d-none" : "d-block";
 
     protected override async Task OnInitializedAsync()
     {
         _listSearched = await ShoeRepository.GetAllLoadingAsync();
+        _user = UserCascaded != null ? UserRepository.GetUserOrdersById(UserCascaded.Id) : new();
+        OrderRealtimeService.Func += HandleUpdateCart;
+    }
+
+    async Task HandleUpdateCart()
+    {
+        _user = UserCascaded != null ? UserRepository.GetUserOrdersById(UserCascaded.Id) : new();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        OrderRealtimeService.Func -= HandleUpdateCart;
+    }
+
+    protected override void OnParametersSet()
+    {
+        _user = UserCascaded != null ? UserRepository.GetUserOrdersById(UserCascaded.Id) : new();
     }
 
     void HandleSearchClick()

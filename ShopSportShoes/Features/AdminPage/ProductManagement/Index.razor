@@ -16,7 +16,7 @@
 <div style="position:relative">
     <MudTable ServerData="@(new Func<TableState, Task<TableData<Shoe>>>(ServerReload))"
               Dense="true" Hover="true" @ref="_shoetable" Virtualize="true"
-              Height="70vh" FixedFooter="true" FixedHeader="true">
+              Height="70vh" FixedFooter="true" FixedHeader="true" Loading="_isLoading">
         <ToolBarContent>
             <MudButton OnClick="() => ShowDialogForm(isEdit: false)" Color="Color.Primary" Variant="Variant.Outlined">Thêm sản phẩm</MudButton>
             <MudSpacer />
@@ -100,16 +100,26 @@
 
     async Task HandleDelete(Shoe shoe)
     {
-        _isLoading = true;
-        // delete images
-        await GoogleDriveService.DeleteRangeAsync(shoe.ImagesNavigation.Select(x => x.ImageName).ToList());
+        var dialog = DialogService.Show<DeleteFormModal>("Sản phẩm sẽ bị xoá vĩnh viễn !!!");
 
-        // delete shoe
-        await ShoeRepository.DeleteAsync(shoe.Id);
-        _shoes.Remove(shoe);
-        await _shoetable.ReloadServerData();
-        Snackbar.Add("Đã xoá", Severity.Info);
-        _isLoading = false;
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            _isLoading = true;
+            await InvokeAsync(StateHasChanged);
+            // delete images
+            await GoogleDriveService.DeleteRangeAsync(shoe.ImagesNavigation.Select(x => x.ImageName).ToList());
+
+            // delete shoe
+            await ShoeRepository.DeleteAsync(shoe.Id);
+            _shoes.Remove(shoe);
+            await _shoetable.ReloadServerData();
+            Snackbar.Add("Đã xoá", Severity.Info);
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+
     }
 
     async Task<TableData<Shoe>> ServerReload(TableState state)

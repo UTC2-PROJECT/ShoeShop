@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 using ShopSportShoes.Data;
@@ -9,9 +10,10 @@ using ShopSportShoes.Data;
 namespace ShopSportShoes.Migrations
 {
     [DbContext(typeof(ShoeShopDbContext))]
-    partial class ShoeShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220102135051_UpdateDb")]
+    partial class UpdateDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,9 +119,6 @@ namespace ShopSportShoes.Migrations
 
                     b.Property<int>("ShoeId")
                         .HasColumnType("NUMBER(10)");
-
-                    b.Property<string>("Size")
-                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("Id");
 

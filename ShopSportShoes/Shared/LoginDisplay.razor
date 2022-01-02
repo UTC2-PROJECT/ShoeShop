@@ -1,13 +1,8 @@
-﻿<AuthorizeView >
+﻿
+<AuthorizeView>
     <Authorized>
         Hello, @context.User.Identity.Name!
         <MudLink Href="Identity/Account/Logout" Underline="Underline.None" Class="mx-3">Đăng xuất</MudLink>
-        @if (!LockCart)
-        {
-            <MudBadge Content="@(UserCascaded?.OrdersNavigation?.Count ?? 0)" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
-                <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
-            </MudBadge>
-        }
     </Authorized>
     <NotAuthorized>
         <MudMenu OffsetY="true" Direction="Direction.Bottom">
@@ -24,18 +19,12 @@
                 </MudMenuItem>
             </ChildContent>
         </MudMenu>
-        @if (!LockCart)
-        {
-            <MudBadge Content="0" Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
-                <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
-            </MudBadge>
-        }
     </NotAuthorized>
 </AuthorizeView>
 
 @code{
-    [CascadingParameter] public User UserCascaded { get; set; }
+   
     [Parameter] public bool LockCart { get; set; }
 
-
+   
 }
