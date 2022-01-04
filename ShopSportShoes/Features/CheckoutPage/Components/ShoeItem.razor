@@ -1,0 +1,19 @@
+﻿<div class="d-flex align-items-center mb-3" style="width:100%;">
+    <MudBadge Content="@(OrderDetails.Quantity)" Color="Color.Primary"  Overlap="true">
+        <div style="border-radius: 5px; border: 1px solid #c3c3c3; width: 66px; height: 66px; overflow:hidden;"
+             class="d-flex align-items-center justify-content-center">
+            <img style="object-fit:cover; width:100%;" src="./images/Shoes/@OrderDetails?.ShoeNavigation?.ImagesNavigation?.FirstOrDefault()?.ImageName" />
+        </div>
+    </MudBadge>
+    <div class="d-flex align-items-center justify-content-between ml-3" style="width:100%;">
+       <div class="d-flex align-items-start justify-content-center flex-column" style="width:100%;">
+           <span style="font-size:1rem; ">@OrderDetails?.ShoeNavigation?.Title</span>
+           <span style="color:#c3c3c3">Size: @OrderDetails?.Size</span>
+       </div>
+       <span style="margin-left:auto; display:block;">@string.Format("{0:#,##0}đ", OrderDetails?.IntoMoney)</span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public OrderDetails OrderDetails { get; set; }
+}

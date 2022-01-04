@@ -51,7 +51,7 @@
                                 <a href="@($"/sanpham/{context.ShoeId}")" style="text-decoration:none;">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div style="height:100px; width:100px;" class="d-flex align-items-center justify-content-center">
-                                            <img style="width:100%; object-fit:contain;" src="@context?.ShoeNavigation?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink" />
+                                            <img style="width:100%; object-fit:contain;" src="./images/Shoes/@context?.ShoeNavigation?.ImagesNavigation?.FirstOrDefault()?.ImageName" />
                                         </div>
                                         <div class="d-flex flex-column justify-content-center align-items-start" style="height:100px;">
                                             <p class="ma-0" style="font-weight:400; font-size:1.2rem;">@context?.ShoeNavigation?.Title</p>
@@ -70,6 +70,7 @@
                                          {
                                              --context.Quantity;
                                              context.IntoMoney -= context.ShoeNavigation.Price;
+                                             OrderDetailsRepository.Update(context);
                                          }
 
                                      })">
@@ -80,9 +81,10 @@
                                     </div>
                                     <div class="px-1 control-quantity" style="cursor: pointer; border: 1px solid #333;"
                                          @onclick="() => {
-                                       ++context.Quantity;
-                                        context.IntoMoney += context.ShoeNavigation.Price;
-                                   }">
+                                                       ++context.Quantity;
+                                                       context.IntoMoney += context.ShoeNavigation.Price;
+                                                       OrderDetailsRepository.Update(context);
+                                                   }">
                                         +1
                                     </div>
                                 </div>
@@ -114,7 +116,8 @@
                     <span style=" color: #d72525; font-weight: 500; font-size: 1.5rem;">@string.Format("{0:#,##0} đ", _totalPrice)</span>
                 </div>
                 <MudButton FullWidth="true" Variant="Variant.Filled" DisableElevation="true"
-                           Color="Color.Primary" Class="mt-5" OnClick="HandleCheckoutClick">Thanh toán</MudButton>
+                           Color="Color.Primary" Class="mt-5"
+                           OnClick="HandleCheckoutClick">Thanh toán</MudButton>
             </MudCard>
         </MudItem>
     </MudGrid>
@@ -136,8 +139,7 @@ else
 
     protected override void OnInitialized()
     {
-        var user = UserRepository.GetUserOrdersById(UserCascaded.Id);
-        _ordersDetails = user.OrdersNavigation.SelectMany(x => x.OrdersDetails).ToList();
+        _ordersDetails = OrderDetailsRepository.GetFilterCustomize(x => x.OrderId == null);
     }
 
     async Task DeleteOrderDetails(OrderDetails orderDetails)

@@ -57,8 +57,7 @@
                 <Authorized>
                     <MudTooltip Text="Xem giỏ hàng">
                         <MudLink Href="/nguoidung/giohang" Underline="Underline.None">
-                            <MudBadge Content="@(_user?.OrdersNavigation?.Where(x => !x.IsPaid && !x.IsCanceled)
-                                     .SelectMany(x => x.OrdersDetails).Count() ?? 0)"
+                            <MudBadge Content="@(_numberOfItem)"
                                       Overlap="true" Color="Color.Primary" Class="mx-6 my-4">
                                 <MudIcon Icon="@Icons.Material.Outlined.ShoppingCart" Color="Color.Dark" Style="font-size:2rem;" />
                             </MudBadge>
@@ -84,7 +83,7 @@
 
     User _user = new();
 
-    int _numberOfItem;
+    int _numberOfItem => _user?.OrdersDetailsNavigation.Where(x => x.OrderId == null).Count() ?? 0;
 
     bool _isShowSearch;
 

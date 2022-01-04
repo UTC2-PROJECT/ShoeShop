@@ -1,9 +1,141 @@
 ﻿@page "/checkout"
+@inject NavigationManager NavigationManager
+@inject OrderDetailsRepository OrderDetailsRepository
+@inject OrderRepository OrderRepository
+@inject OrderRealtimeService OrderRealtimeService
+@inject ISnackbar Snackbar
 
+@using ShopSportShoes.Features.CheckoutPage.Components
 
+<AuthorizeView>
+    <Authorized>
 
+        <MudGrid>
+            <MudItem xs="7">
+                <MudCard Class="pa-3">
+                    <MudForm Model="_order" @ref="_form">
+                        <MudGrid>
+                            <MudItem xs="12">
+                                <h2 style="font-weight: 400; margin-bottom: 24px;">Thông tin thanh toán</h2>
+                                <div class="d-flex align-items-center">
+                                    <div class="d-flex align-items-center justify-content-center mr-3"
+                                         style="background: #c3c3c3; padding: 10px; border-radius: 12px; ">
+                                        <MudIcon Icon="@Icons.Filled.PeopleOutline" Style="font-size: 36px; color: white;"></MudIcon>
+                                    </div>
+                                    <div>
+                                        <span style="color: grey; font-size: 1rem;">@($"{UserCascaded.Name}({UserCascaded.Email})")</span>
+                                    </div>
+                                </div>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudTextField @bind-Value="UserCascaded.Name" Label="Họ và tên" Variant="Variant.Outlined"
+                                              Margin="Margin.Dense" />
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudTextField @bind-Value="_order.PhoneNumber" Label="số điện thoại" Variant="Variant.Outlined"
+                                              Margin="Margin.Dense" Validation="@(OrderValidation.ValidateValue)" For="() => _order.PhoneNumber"/>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <div style="width:100%; border-radius: 5px; border:1px solid #c3c3c3">
+                                    <div class="pa-3" style="border-bottom: 1px solid #c3c3c3">
+                                        Giao tận nơi - thanh toán trực tiếp khi nhận hàng
+                                    </div>
+                                    <div class="pa-3">
+                                        <MudItem xs="12">
+                                            <MudTextField @bind-Value="_order.Address" Label="Địa chỉ giao hàng" Variant="Variant.Outlined"
+                                                          Margin="Margin.Dense" FullWidth="true" 
+                                                          Validation="@(OrderValidation.ValidateValue)" For="() => _order.Address"/>
+                                        </MudItem>
+                                    </div>
+                                </div>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudButton Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo("/nguoidung/giohang"))">Giỏ hàng</MudButton>
+                            </MudItem>
+                        </MudGrid>
+                    </MudForm>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="4">
+                <MudGrid>
+                    <MudItem xs="12">
+                        @foreach (var item in _ordersDetails)
+                        {
+                            <ShoeItem OrderDetails="item" />
+                        }
+                        <MudDivider Class="my-3" />
+                    </MudItem>
 
+                    <MudItem xs="12">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Tạm tính</span>
+                            <span>@string.Format("{0:#,##0}đ", _ordersDetails.Sum(x => x.IntoMoney))</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Phí vận chuyển</span>
+                            <span>0đ</span>
+                        </div>
+                        <MudDivider Class="my-3" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <div class="d-flex justify-content-between align-items-center" style="font-size:1.5rem;">
+                            <span>Tổng cộng</span>
+                            <span>@string.Format("{0:#,##0}đ", _ordersDetails.Sum(x => x.IntoMoney))</span>
+                        </div>
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudButton Variant="Variant.Filled" FullWidth="true" Color="Color.Primary" DisableElevation="true"
+                                   OnClick="HandleCompleteOrder">Xác nhận đơn hàng</MudButton>
+                    </MudItem>
+
+                </MudGrid>
+            </MudItem>
+        </MudGrid>
+    </Authorized>
+</AuthorizeView>
 
 @code{
+    [CascadingParameter(Name = "UserCascaded")] private User UserCascaded { get; set; }
 
+    List<OrderDetails> _ordersDetails = new();
+
+    Order _order = new();
+    MudForm _form;
+    OrderValidation OrderValidation = new();
+
+    protected override void OnInitialized()
+    {
+        if (UserCascaded != null)
+        {
+            _ordersDetails = OrderDetailsRepository.GetFilterCustomize(x => x.UserId == UserCascaded.Id && x.OrderId == null) ?? new();
+        }
+    }
+
+    async Task HandleCompleteOrder()
+    {
+        await _form.Validate();
+        if (_form.IsValid)
+        {
+            Order newOrder = new Order
+            {
+                UserId = UserCascaded.Id,
+                DateCreated = DateTime.Now,
+                TotalPrice = _ordersDetails.Sum(x => x.IntoMoney),
+                PhoneNumber = _order.PhoneNumber,
+                Address = _order.Address
+            };
+            var orderAdded = await OrderRepository.AddAsync(newOrder);
+
+            foreach (var item in _ordersDetails)
+            {
+                item.OrderId = orderAdded.Id;
+                OrderDetailsRepository.Update(item);
+            }
+            OrderRealtimeService.UpdateCart();
+            Snackbar.Add("Đơn hàng sẽ giao đến bạn từ 3 - 5 ngày, hãy để ý đến điện thoại shiper sẽ gọi đến trong vài ngày tới", Severity.Info);
+            NavigationManager.NavigateTo("/nguoidung/donhang");
+        }
+    }
 }

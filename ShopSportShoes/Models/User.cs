@@ -21,6 +21,7 @@ namespace ShopSportShoes.Models
         public bool IsAdmin { get; set; }
         public List<Order> OrdersNavigation { get; set; }
         public List<Evolution> EvolutionsNavigation { get; set; }
+        public List<OrderDetails> OrdersDetailsNavigation { get; set; }
 
         [NotMapped]
         public string Password { get; set; }

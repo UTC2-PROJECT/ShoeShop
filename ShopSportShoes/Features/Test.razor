@@ -1,10 +1,55 @@
 ﻿@page "/test"
 @inject GoogleDriveService GoogleDriveService
-<MudButton OnClick="Click">Click</MudButton> 
+@inject ImageFileService ImageFileService
+@inject ISnackbar Snackbar
+
+<InputFile id="fileInput" OnChange="ChangeFiles" hidden multiple />
+
+<MudButton HtmlTag="label"
+           Variant="Variant.Filled"
+           Color="Color.Primary"
+           StartIcon="@Icons.Filled.CloudUpload"
+           for="fileInput">
+    Upload Files
+</MudButton>
+<MudButton OnClick="Click">Click</MudButton>
+<MudButton OnClick="Remove">Remove</MudButton>
+
+<img src="./images/Shoes/@_imageName"/>
 
 @code {
+
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+
+    string _imageName;
+
+    private void ChangeFiles(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            files.Add(file);
+        }
+    }
+
     async Task Click()
     {
-        await GoogleDriveService.GetFileById("1u590k9DC3aAcrKIDUcvmr8b6-E_DmrOX");
+        //_imageName = await ImageFileService.AddImageFile(files[0], "");
+        //if (!string.IsNullOrEmpty(_imageName))
+        //{
+        //    Snackbar.Add("Susscess");
+        //}
+        //await GoogleDriveService.GetFileById("1u590k9DC3aAcrKIDUcvmr8b6-E_DmrOX");
+    }
+
+    void Remove()
+    {
+        if (!string.IsNullOrEmpty(_imageName))
+        {
+            if (ImageFileService.DeleteImage(_imageName))
+            {
+                Snackbar.Add("Susscess");
+            }
+        }
+
     }
 }

@@ -189,3 +189,44 @@ INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
 VALUES (N'20220103061307_UpdateDb2', N'5.0.13')
 /
 
+ALTER TABLE "OrderDetails" DROP CONSTRAINT "FK_OrderDetails_Orders_OrderId"
+/
+
+ALTER TABLE "Orders" ADD "Address" NVARCHAR2(2000)
+/
+
+ALTER TABLE "Orders" ADD "PhoneNumber" NVARCHAR2(2000)
+/
+
+declare
+   l_nullable user_tab_columns.nullable % type;
+begin 
+   select nullable into l_nullable 
+   from user_tab_columns 
+  where table_name = 'OrderDetails' 
+  and column_name = 'OrderId' 
+;
+   if l_nullable = 'N' then 
+        EXECUTE IMMEDIATE 'ALTER TABLE "OrderDetails" MODIFY "OrderId" NUMBER(10) NULL';
+ else 
+        EXECUTE IMMEDIATE 'ALTER TABLE "OrderDetails" MODIFY "OrderId" NUMBER(10)';
+ end if;
+end;
+/
+
+ALTER TABLE "OrderDetails" ADD "UserId" NUMBER(10) DEFAULT 0 NOT NULL
+/
+
+CREATE INDEX "IX_OrderDetails_UserId" ON "OrderDetails" ("UserId")
+/
+
+ALTER TABLE "OrderDetails" ADD CONSTRAINT "FK_OrderDetails_Orders_OrderId" FOREIGN KEY ("OrderId") REFERENCES "Orders" ("Id")
+/
+
+ALTER TABLE "OrderDetails" ADD CONSTRAINT "FK_OrderDetails_Users_UserId" FOREIGN KEY ("UserId") REFERENCES "Users" ("Id") ON DELETE CASCADE
+/
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES (N'20220103144615_UpdateDb3', N'5.0.13')
+/
+

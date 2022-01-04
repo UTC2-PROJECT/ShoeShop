@@ -5,7 +5,7 @@
 @inject ShoeSizeRepository ShoeSizeRepository
 @inject SizeRepository SizeRepository
 @inject ShoeCatalogRepository ShoeCatalogRepository
-@inject GoogleDriveService GoogleDriveService
+@inject ImageFileService ImageFileService
 @inject ShoeConfigService ShoeConfigService
 @inject ISnackbar Snackbar
 
@@ -37,10 +37,10 @@
             <MudTd DataLabel="Title">@context.Title</MudTd>
             <MudTd DataLabel="Description">@context.Trademark</MudTd>
             <MudTd DataLabel="Images">
-                <img src="@(context?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink)"
+                <img src="./images/Shoes/@(context?.ImagesNavigation?.FirstOrDefault()?.ImageName)"
                      style="object-fit:contain; width:100px;height:100px" @onclick="() => {
                                                                                     _isOpenOverlay = true;
-                                                                                    _imgSrcOverlay = context?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink;
+                                                                                    _imgSrcOverlay = context?.ImagesNavigation?.FirstOrDefault()?.ImageName;
                                                                                 }" />
             </MudTd>
             <MudTd DataLabel="Sizes">@(string.Join(", ", context?.ShoeSizesNavigation?.Select(x => x?.SizeNavigation?.SizeName)))</MudTd>
@@ -109,7 +109,7 @@
             _isLoading = true;
             await InvokeAsync(StateHasChanged);
             // delete images
-            await GoogleDriveService.DeleteRangeAsync(shoe.ImagesNavigation.Select(x => x.ImageName).ToList());
+            ImageFileService.DeleteRangeImage(shoe.ImagesNavigation.Select(x => x.ImageName).ToList());
 
             // delete shoe
             await ShoeRepository.DeleteAsync(shoe.Id);

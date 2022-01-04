@@ -1,7 +1,7 @@
 ﻿@inject ImageRepository ImageRepository
 @inject ShoeRepository ShoeRepository
 @inject ShoeSizeRepository ShoeSizeRepository
-@inject GoogleDriveService GoogleDriveService
+@inject ImageFileService ImageFileService
 @inject ISnackbar Snackbar
 
 @using System.IO;
@@ -103,7 +103,7 @@
                             @foreach (var item in Shoe.ImagesNavigation)
                             {
                                 <MudCard Style="width:100px; height:100px;" Class="ma-2 d-flex align-items-center">
-                                    <img loading="lazy" src="@item.ThumbnailLink" style="object-fit:contain;width:100%; cursor:pointer;" />
+                                    <img loading="lazy" src="./images/Shoes/@item.ImageName" style="object-fit:contain;width:100%; cursor:pointer;" />
                                     <MudIcon Icon="@Icons.Material.Outlined.Delete" Color="Color.Primary" Style="font-size:20px; cursor:pointer;"
                                              @onclick="() => {
                                                            Shoe.ImagesNavigation.Remove(item);
@@ -143,7 +143,6 @@
     List<ShopSportShoes.Models.Size> _sizesSeleted = new();
     List<ShopSportShoes.Models.Size> _sizeDeleteds = new();
     List<IBrowserFile> _newFiles = new();
-    List<Image> _imageAddeds = new();
     List<Image> _imageDeleteds = new();
 
 
@@ -205,12 +204,14 @@
 
     async Task AddImage(IBrowserFile browserFile, int shoeId)
     {
-        string imageName = $"{DateTime.Now.ToString("dd-MM-yyyyhh-mm-")}{browserFile.Name}";
-        var fileId = await GoogleDriveService.UploadFIleAsync(browserFile, imageName);
-        //string thumbnailLink = $"https://www.googleapis.com/drive/v3/files/{fileId}?alt=media&key=AIzaSyD739-eb6NzS_KbVJq1K8ZAxnrMfkIqPyw";
-        string thumbnailLink = $"https://drive.google.com/thumbnail?authuser=0&sz=w2000&id={fileId}";
+        string imageName = $"{Guid.NewGuid()}-{browserFile.Name}";
 
-        if (string.IsNullOrEmpty(fileId))
+        //var fileId = await GoogleDriveService.UploadFIleAsync(browserFile, imageName);
+        ////string thumbnailLink = $"https://www.googleapis.com/drive/v3/files/{fileId}?alt=media&key=AIzaSyD739-eb6NzS_KbVJq1K8ZAxnrMfkIqPyw";
+        //string thumbnailLink = $"https://drive.google.com/thumbnail?authuser=0&sz=w2000&id={fileId}";
+
+        var result = await ImageFileService.AddImageFile(browserFile, imageName);
+        if (!result)
         {
             Snackbar.Add("Upload ảnh thất bại", Severity.Info);
         }
@@ -219,11 +220,10 @@
             Image image = new()
             {
                 ImageName = imageName,
-                ThumbnailLink = thumbnailLink,
+                ThumbnailLink = imageName,
                 ShoeId = shoeId
             };
-            var imageAdded = await ImageRepository.AddAsync(image);
-            _imageAddeds.Add(imageAdded);
+            await ImageRepository.AddAsync(image);
         }
     }
 
@@ -294,7 +294,7 @@
         // Delete images
         if (_imageDeleteds.Count > 0)
         {
-            await Task.WhenAll(GoogleDriveService.DeleteRangeAsync(_imageDeleteds.Select(x => x.ImageName).ToList()));
+            ImageFileService.DeleteRangeImage(_imageDeleteds.Select(x => x.ImageName).ToList());
         }
         foreach (var item in _imageDeleteds)
         {

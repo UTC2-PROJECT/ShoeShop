@@ -90,6 +90,9 @@ namespace ShopSportShoes
             services.AddSingleton<ShoeCatalogRepository>();
             services.AddSingleton<OrderRepository>();
             services.AddSingleton<OrderDetailsRepository>();
+            services.AddSingleton<ImageFileService>();
+
+
 
         }
 

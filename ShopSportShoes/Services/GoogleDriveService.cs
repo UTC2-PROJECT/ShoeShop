@@ -30,18 +30,18 @@ namespace ShopSportShoes.Services
             using (var stream =
                 new FileStream("wwwroot/credentials/credentials.json", FileMode.Open, FileAccess.Read))
             {
-                string credPath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-
-                credPath = Path.Combine(credPath, "wwwroot/credentials/credentials.json");
-
+                // The file token.json stores the user's access and refresh tokens, and is created
+                // automatically when the authorization flow completes for the first time.
+                string credPath = "wwwroot/credentials/token.json";
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
                     Scopes,
-                    "user",
+                    "5951071031@st.utc2.edu.vn",
                     CancellationToken.None,
                     new FileDataStore(credPath, true)).Result;
             }
 
+            // Create Drive API service.
             var service = new DriveService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
@@ -67,7 +67,7 @@ namespace ShopSportShoes.Services
                 {
                     request = service.Files.Create(fileMetadata, stream, browserFile.ContentType);
                     request.Fields = "id, name, parents, createdTime, modifiedTime, mimeType, thumbnailLink, webViewLink, webContentLink";
-                    request.IncludePermissionsForView = "published";
+                    //request.IncludePermissionsForView = "published";
                     await request.UploadAsync();
                 }
                 var file = request.ResponseBody;

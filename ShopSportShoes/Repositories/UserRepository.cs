@@ -34,10 +34,9 @@ namespace ShopSportShoes.Repositories
             var context = _contextFactory.CreateDbContext();
             return context.Users.Where(x => x.Id == id)
                                     .Include(x => x.OrdersNavigation)
-                                        .ThenInclude(x => x.OrdersDetails)
+                                    .Include(x => x.OrdersDetailsNavigation)
                                             .ThenInclude(x => x.ShoeNavigation.ShoeCatalogNavigation)
-                                    .Include(x => x.OrdersNavigation)
-                                        .ThenInclude(x => x.OrdersDetails)
+                                    .Include(x => x.OrdersDetailsNavigation)
                                             .ThenInclude(x => x.ShoeNavigation.ImagesNavigation)
                                     .FirstOrDefault();
         }
