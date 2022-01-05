@@ -75,3 +75,12 @@ a, .btn-link {
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }
+
+.text-hiding {
+    line-height: 1.5em;
+    height: 3em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+}

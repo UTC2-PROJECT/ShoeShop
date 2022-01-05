@@ -10,8 +10,8 @@ using ShopSportShoes.Data;
 namespace ShopSportShoes.Migrations
 {
     [DbContext(typeof(ShoeShopDbContext))]
-    [Migration("20220102135051_UpdateDb")]
-    partial class UpdateDb
+    [Migration("20220105131429_UpdateDb2")]
+    partial class UpdateDb2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -79,8 +79,14 @@ namespace ShopSportShoes.Migrations
                         .HasColumnType("NUMBER(10)")
                         .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Address")
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<bool>("IsCanceled")
                         .HasColumnType("NUMBER(1)");
@@ -88,10 +94,13 @@ namespace ShopSportShoes.Migrations
                     b.Property<bool>("IsPaid")
                         .HasColumnType("NUMBER(1)");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.Property<double>("TotalPrice")
                         .HasColumnType("BINARY_DOUBLE");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("Id");
@@ -111,7 +120,7 @@ namespace ShopSportShoes.Migrations
                     b.Property<double>("IntoMoney")
                         .HasColumnType("BINARY_DOUBLE");
 
-                    b.Property<int>("OrderId")
+                    b.Property<int?>("OrderId")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<int>("Quantity")
@@ -120,11 +129,19 @@ namespace ShopSportShoes.Migrations
                     b.Property<int>("ShoeId")
                         .HasColumnType("NUMBER(10)");
 
+                    b.Property<string>("Size")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("NUMBER(10)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ShoeId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("OrderDetails");
                 });
@@ -141,6 +158,9 @@ namespace ShopSportShoes.Migrations
 
                     b.Property<double>("Price")
                         .HasColumnType("BINARY_DOUBLE");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("NUMBER(10)");
 
                     b.Property<int>("ShoeCatalogId")
                         .HasColumnType("NUMBER(10)");
@@ -271,9 +291,7 @@ namespace ShopSportShoes.Migrations
                 {
                     b.HasOne("ShopSportShoes.Models.User", "UserNavigation")
                         .WithMany("OrdersNavigation")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("UserNavigation");
                 });
@@ -282,9 +300,7 @@ namespace ShopSportShoes.Migrations
                 {
                     b.HasOne("ShopSportShoes.Models.Order", "OrderNavigation")
                         .WithMany("OrdersDetails")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OrderId");
 
                     b.HasOne("ShopSportShoes.Models.Shoe", "ShoeNavigation")
                         .WithMany()
@@ -292,9 +308,15 @@ namespace ShopSportShoes.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ShopSportShoes.Models.User", "UserNavigation")
+                        .WithMany("OrdersDetailsNavigation")
+                        .HasForeignKey("UserId");
+
                     b.Navigation("OrderNavigation");
 
                     b.Navigation("ShoeNavigation");
+
+                    b.Navigation("UserNavigation");
                 });
 
             modelBuilder.Entity("ShopSportShoes.Models.Shoe", b =>
@@ -352,6 +374,8 @@ namespace ShopSportShoes.Migrations
             modelBuilder.Entity("ShopSportShoes.Models.User", b =>
                 {
                     b.Navigation("EvolutionsNavigation");
+
+                    b.Navigation("OrdersDetailsNavigation");
 
                     b.Navigation("OrdersNavigation");
                 });

@@ -37,10 +37,10 @@
             <MudTd DataLabel="Title">@context.Title</MudTd>
             <MudTd DataLabel="Description">@context.Trademark</MudTd>
             <MudTd DataLabel="Images">
-                <img src="./images/Shoes/@(context?.ImagesNavigation?.FirstOrDefault()?.ImageName)"
+                <img src="@(context?.ImagesNavigation?.FirstOrDefault()?.ImageSource)"
                      style="object-fit:contain; width:100px;height:100px" @onclick="() => {
                                                                                     _isOpenOverlay = true;
-                                                                                    _imgSrcOverlay = context?.ImagesNavigation?.FirstOrDefault()?.ImageName;
+                                                                                    _imgSrcOverlay = context?.ImagesNavigation?.FirstOrDefault()?.ImageSource;
                                                                                 }" />
             </MudTd>
             <MudTd DataLabel="Sizes">@(string.Join(", ", context?.ShoeSizesNavigation?.Select(x => x?.SizeNavigation?.SizeName)))</MudTd>
@@ -109,7 +109,7 @@
             _isLoading = true;
             await InvokeAsync(StateHasChanged);
             // delete images
-            ImageFileService.DeleteRangeImage(shoe.ImagesNavigation.Select(x => x.ImageName).ToList());
+            ImageFileService.DeleteRangeImage(shoe.ImagesNavigation.Select(x => x.ImageSource).ToList());
 
             // delete shoe
             await ShoeRepository.DeleteAsync(shoe.Id);

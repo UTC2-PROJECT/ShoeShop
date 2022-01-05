@@ -1,5 +1,7 @@
 ﻿@page "/test"
 @inject GoogleDriveService GoogleDriveService
+@inject ImageRepository ImageRepository
+@inject ShoeRepository ShoeRepository
 @inject ImageFileService ImageFileService
 @inject ISnackbar Snackbar
 
@@ -12,16 +14,19 @@
            for="fileInput">
     Upload Files
 </MudButton>
-<MudButton OnClick="Click">Click</MudButton>
+<br />
+<MudButton OnClick="Click" Variant="Variant.Outlined">Thêm giày</MudButton>
 <MudButton OnClick="Remove">Remove</MudButton>
 
-<img src="./images/Shoes/@_imageName"/>
+<img src="@_imageName"/>
 
 @code {
 
     IList<IBrowserFile> files = new List<IBrowserFile>();
 
     string _imageName;
+
+    byte[] _imageSource = new byte[0];
 
     private void ChangeFiles(InputFileChangeEventArgs e)
     {
@@ -31,14 +36,35 @@
         }
     }
 
+    string ArrayByteToString(byte[] array)
+    {
+        string result = "";
+        foreach(var item in array)
+        {
+            result += item;
+        }
+        return result;
+    }
+
     async Task Click()
     {
-        //_imageName = await ImageFileService.AddImageFile(files[0], "");
-        //if (!string.IsNullOrEmpty(_imageName))
+        //Shoe shoe = new()
         //{
-        //    Snackbar.Add("Susscess");
-        //}
-        //await GoogleDriveService.GetFileById("1u590k9DC3aAcrKIDUcvmr8b6-E_DmrOX");
+        //    Title = "Title 1",
+        //    Description = "Description 1",
+        //    Price = 9000000,
+        //    Quantity = 100,
+        //    Trademark = "Addidas",
+        //    ShoeCatalogId = 2,
+        //};
+        //Image 
+        //var shoeAdded = await ShoeRepository.AddAsync(shoe);
+        var stream = files[0].OpenReadStream(10240000);
+        _imageSource = new byte[stream.Length];
+
+        await stream.ReadAsync(_imageSource, 0, Convert.ToInt32(stream.Length));
+        var base64 = Convert.ToBase64String(_imageSource);
+        _imageName = $"data:image/*;base64,{base64}";
     }
 
     void Remove()

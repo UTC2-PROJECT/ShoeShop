@@ -33,7 +33,7 @@
                     <MudLink Href="@($"/sanpham/{item.Id}")" @onclick="() => _textSearch = string.Empty" Underline="Underline.None">
                         <div class="w-100 d-flex align-items-center flex-nowrap pa-2 result-search-item ">
                             <MudCard style="width: 80px; height: 80px;" class="d-flex align-items-center justify-content-end mr-3">
-                                <img src="@item?.ImagesNavigation?.FirstOrDefault()?.ThumbnailLink" style="object-fit:contain; width:100%;" />
+                                <img src="@item?.ImagesNavigation?.FirstOrDefault()?.ImageSource" style="object-fit:contain; width:100%;" />
                             </MudCard>
                             <div class="w-100 d-flex flex-wrap align-items-center justify-content-start" Style="height:80px">
                                 <p class="ma-0 w-100 font-weight-bold" style="color:red;"><MudHighlighter Text="@item.Title" HighlightedText="@_textSearch" /></p>

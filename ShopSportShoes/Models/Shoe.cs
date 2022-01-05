@@ -19,6 +19,7 @@ namespace ShopSportShoes.Models
         public double Price { get; set; }
         public string Description { get; set; }
         public string Trademark { get; set; }
+        public int Quantity { get; set; }
         public int ShoeCatalogId { get; set; }
         public ShoeCatalog ShoeCatalogNavigation { get; set; }
         public List<ShoeSize> ShoeSizesNavigation { get; set; }
@@ -44,8 +45,8 @@ namespace ShopSportShoes.Models
     public class Image
     {
         public int Id { get; set; }
-        public string ImageName { get; set; }
-        public string ThumbnailLink { get; set; }
+        [MaxLength(int.MaxValue)]
+        public string ImageSource { get; set; }
         public int ShoeId { get; set; }
         public Shoe ShoeNavigation { get; set; }
     }

@@ -10,8 +10,8 @@ using ShopSportShoes.Data;
 namespace ShopSportShoes.Migrations
 {
     [DbContext(typeof(ShoeShopDbContext))]
-    [Migration("20220103144615_UpdateDb3")]
-    partial class UpdateDb3
+    [Migration("20220105094008_UpdateDb")]
+    partial class UpdateDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -59,6 +59,10 @@ namespace ShopSportShoes.Migrations
                     b.Property<string>("ImageName")
                         .HasColumnType("NVARCHAR2(2000)");
 
+                    b.Property<byte[]>("ImageSoure")
+                        .HasMaxLength(5000)
+                        .HasColumnType("blob");
+
                     b.Property<int>("ShoeId")
                         .HasColumnType("NUMBER(10)");
 
@@ -85,6 +89,9 @@ namespace ShopSportShoes.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("TIMESTAMP(7)");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("NVARCHAR2(2000)");
+
                     b.Property<bool>("IsCanceled")
                         .HasColumnType("NUMBER(1)");
 
@@ -97,7 +104,7 @@ namespace ShopSportShoes.Migrations
                     b.Property<double>("TotalPrice")
                         .HasColumnType("BINARY_DOUBLE");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("Id");
@@ -129,7 +136,7 @@ namespace ShopSportShoes.Migrations
                     b.Property<string>("Size")
                         .HasColumnType("NVARCHAR2(2000)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("NUMBER(10)");
 
                     b.HasKey("Id");
@@ -155,6 +162,9 @@ namespace ShopSportShoes.Migrations
 
                     b.Property<double>("Price")
                         .HasColumnType("BINARY_DOUBLE");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("NUMBER(10)");
 
                     b.Property<int>("ShoeCatalogId")
                         .HasColumnType("NUMBER(10)");
@@ -285,9 +295,7 @@ namespace ShopSportShoes.Migrations
                 {
                     b.HasOne("ShopSportShoes.Models.User", "UserNavigation")
                         .WithMany("OrdersNavigation")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("UserNavigation");
                 });
@@ -306,9 +314,7 @@ namespace ShopSportShoes.Migrations
 
                     b.HasOne("ShopSportShoes.Models.User", "UserNavigation")
                         .WithMany("OrdersDetailsNavigation")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("OrderNavigation");
 

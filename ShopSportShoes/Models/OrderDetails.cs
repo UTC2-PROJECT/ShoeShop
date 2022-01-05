@@ -13,7 +13,7 @@ namespace ShopSportShoes.Models
         public int Quantity { get; set; }
         public int ShoeId { get; set; }
         public int? OrderId { get; set; }
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         public Shoe ShoeNavigation { get; set; }
         public User UserNavigation { get; set; }
         public virtual Order OrderNavigation { get; set; }

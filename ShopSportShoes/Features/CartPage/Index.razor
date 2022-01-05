@@ -26,7 +26,7 @@
                             Style="max-height:55vh; overflow-x:hidden; overflow-y:scroll; width:100%;">
                 <colGroup>
                     <col style="text-align:center;" />
-                    <col style="width:45%" />
+                    <col style="width:300px; overflow:hidden;" />
                     <col style="text-align:center;" />
                     <col style="width:19%" />
                     <col style="text-align:center;" />
@@ -49,12 +49,12 @@
                             <td>@(_ordersDetails.FindIndex(x => x.Id == context.Id) + 1)</td>
                             <td>
                                 <a href="@($"/sanpham/{context.ShoeId}")" style="text-decoration:none;">
-                                    <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center justify-content-start" style="width:100%;">
                                         <div style="height:100px; width:100px;" class="d-flex align-items-center justify-content-center">
-                                            <img style="width:100%; object-fit:contain;" src="./images/Shoes/@context?.ShoeNavigation?.ImagesNavigation?.FirstOrDefault()?.ImageName" />
+                                            <img style="width:100%; object-fit:contain;" src="@context?.ShoeNavigation?.ImagesNavigation?.FirstOrDefault()?.ImageSource" />
                                         </div>
-                                        <div class="d-flex flex-column justify-content-center align-items-start" style="height:100px;">
-                                            <p class="ma-0" style="font-weight:400; font-size:1.2rem;">@context?.ShoeNavigation?.Title</p>
+                                        <div class="d-flex flex-column justify-content-center align-items-start ml-2">
+                                            <p class="ma-0 text-hiding">@context?.ShoeNavigation?.Title</p>
                                             <p class="ma-0 d-flex align-items-center" style="white-space:nowrap">Loại: @context?.ShoeNavigation?.ShoeCatalogNavigation?.Name | Thương hiệu:@context?.ShoeNavigation?.Trademark </p>
                                             <p class="ma-0 mt-2 font-weight-bold" style="color:red;">@string.Format("{0:#,##0} đ", @context?.ShoeNavigation?.Price)</p>
                                         </div>

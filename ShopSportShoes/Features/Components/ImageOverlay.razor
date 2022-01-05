@@ -2,7 +2,7 @@
     <MudPaper Class="pa-2">
         @if (ImageSource != null)
         {
-            <img src="./images/Shoes/@ImageSource" loading="lazy" style="max-width:90vw; max-height:90vh; object-fit:contain;" alt="Ảnh phóng to" />
+            <img src="@ImageSource" loading="lazy" style="max-width:90vw; max-height:90vh; object-fit:contain;" alt="Ảnh phóng to" />
         }
         <MudIconButton Icon="@Icons.Material.Filled.Close"
                        Style="position: absolute; top: -.75rem; right: -.75rem; background-color: #fff"
