@@ -1,0 +1,78 @@
+﻿@page "/nguoidung/donhang/{OrderId:int}"
+
+<MudCard Class="overflow-hidden" Elevation="25">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal" TimelinePosition="TimelinePosition.Top">
+                <MudTimelineItem Color="Color.Success" Size="MudBlazor.Size.Large">
+                    <ItemDot>
+                        <MudIcon Size="MudBlazor.Size.Large" Icon="@Icons.Filled.ShoppingBag" />
+                    </ItemDot>
+                    <ItemContent>
+                        <MudText Align="Align.Center">Đặt hàng</MudText>
+                    </ItemContent>
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Success" Size="MudBlazor.Size.Large">
+                    <ItemDot>
+                        <MudIcon Icon="fas fa-spinner" />
+                    </ItemDot>
+                    <ItemContent>
+                        <MudText Align="Align.Center">Đang xử lý</MudText>
+                    </ItemContent>
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Success" Size="MudBlazor.Size.Large">
+                    <ItemDot>
+                        <MudIcon Size="MudBlazor.Size.Large" Icon="fas fa-shuttle-van" Style="font-size:1.5rem;text-align:center;" />
+                    </ItemDot>
+                    <ItemContent>
+                        <MudText Align="Align.Center">Đang giao</MudText>
+                    </ItemContent>
+                </MudTimelineItem>
+                <MudTimelineItem Color="Color.Success" Size="MudBlazor.Size.Large">
+                    <ItemDot>
+                        <MudIcon Size="MudBlazor.Size.Large" Icon="@Icons.Filled.Check" />
+                    </ItemDot>
+                    <ItemContent>
+                        <MudText Align="Align.Center">Đơn hàng đã giao</MudText>
+                    </ItemContent>
+                </MudTimelineItem>
+            </MudTimeline>
+        </MudItem>
+        <MudItem xs="12">
+            <div style="width: 200px; margin-left:auto" class="mt-5">
+                <MudButton FullWidth="true" Variant="Variant.Filled"
+                           DisableElevation="true" Color="Color.Primary">Mua tiếp</MudButton>
+            </div>
+        </MudItem>
+        <MudItem xs="12">
+            <MudGrid Class="mt-5 pb-3" Style="border-top: 3px solid #dbdbdb">
+                <MudItem xs="4" Class="px-3">
+                    <div style="width:90%; height:100%; border-right:3px solid #dbdbdb"
+                         class="d-flex justify-content-center">
+                        Đơn vị giao hàng Express
+                    </div>
+                </MudItem>
+                <MudItem xs="8">
+                    <MudTimeline TimelinePosition="TimelinePosition.Left">
+                        <MudTimelineItem Color="Color.Primary">
+                            <MudText>10:30AM 03-04-2021 Giao kiện hàng thành công</MudText>
+                        </MudTimelineItem>
+                        <MudTimelineItem>
+                            <MudText>7:30AM 02-04-2021 Lấy hàng thành công đang đi giao</MudText>
+                        </MudTimelineItem>
+                        <MudTimelineItem>
+                            <MudText>4:30PM 01-04-2021 Đơn hàng đã giao đến kho</MudText>
+                        </MudTimelineItem>
+                        <MudTimelineItem>
+                            <MudText>6:30PM 01-04-2021 Đơn hàng đang đóng gói</MudText>
+                        </MudTimelineItem>
+                    </MudTimeline>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+    </MudGrid>
+</MudCard>
+
+@code {
+
+}

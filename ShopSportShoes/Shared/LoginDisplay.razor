@@ -12,21 +12,21 @@
 <AuthorizeView>
     <Authorized>
         <div class="d-flex align-items-center">
-            <div>Hello, @context.User.Identity.Name!
-                <div class="account-dropdown d-flex flex-column">
-                    <div class="d-flex align-items-center">
-                        
-                    </div>
-                </div>
-            </div>
-            <MudLink Href="Identity/Account/Logout" Underline="Underline.None" Class="mx-3">Đăng xuất</MudLink>
+            <MudMenu FullWidth="true" OffsetY="true" AnchorOrigin="Origin.BottomCenter">
+                <ActivatorContent>
+                    <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary">Hello, @context.User.Identity.Name!</MudChip>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem><MudLink Href="/nguoidung/donhang" Underline="Underline.None">Đơn hàng</MudLink></MudMenuItem>
+                    <MudMenuItem><MudLink Href="Identity/Account/Logout" Underline="Underline.None">Đăng xuất</MudLink></MudMenuItem>
+                </ChildContent>
+            </MudMenu>
         </div>
     </Authorized>
     <NotAuthorized>
-        <MudMenu OffsetY="true" Direction="Direction.Bottom">
+        <MudMenu OffsetY="true" AnchorOrigin="Origin.BottomCenter" FullWidth="true">
             <ActivatorContent>
-                <MudIcon Icon="@Icons.Outlined.SupervisedUserCircle" Style="font-size:2rem"
-                         Color="Color.Dark" />
+                <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary">Chưa đăng nhập</MudChip>
             </ActivatorContent>
             <ChildContent>
                 <MudMenuItem>

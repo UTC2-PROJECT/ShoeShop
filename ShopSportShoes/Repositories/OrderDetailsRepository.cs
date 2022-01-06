@@ -23,6 +23,16 @@ namespace ShopSportShoes.Repositories
             return context.OrderDetails.Where(filter)
                                        .Include(x => x.ShoeNavigation.ImagesNavigation)
                                        .Include(x => x.ShoeNavigation.ShoeCatalogNavigation)
+                                       .Include(x => x.OrderNavigation)
+                                       .ToList();
+        }
+
+        public List<OrderDetails> GetAllCustomize()
+        {
+            var context = _contextFactory.CreateDbContext();
+            return context.OrderDetails.Include(x => x.ShoeNavigation.ImagesNavigation)
+                                       .Include(x => x.ShoeNavigation.ShoeCatalogNavigation)
+                                       .Include(x => x.OrderNavigation)
                                        .ToList();
         }
 

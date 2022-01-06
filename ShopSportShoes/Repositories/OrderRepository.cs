@@ -19,7 +19,8 @@ namespace ShopSportShoes.Repositories
         public List<Order> GetAllCustom()
         {
             var context = _contextFactory.CreateDbContext();
-            return context.Orders.Include(x => x.OrdersDetails)
+            return context.Orders.OrderByDescending(x => x.DateCreated)
+                                 .Include(x => x.OrdersDetails)
                                     .ThenInclude(x => x.ShoeNavigation.ImagesNavigation)
                                  .Include(x => x.OrdersDetails)
                                     .ThenInclude(x => x.ShoeNavigation.ShoeCatalogNavigation)

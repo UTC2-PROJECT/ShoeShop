@@ -1,9 +1,10 @@
 ﻿@page "/sanpham/tatca"
 
-
 @inject ShoeRepository ShoeRepository
+
 @using LinqKit
 @using ShopSportShoes.Features.ListProducts.Components
+
 <MudGrid>
     <MudItem xs="3">
         <ShoeFilterControl FilterChanged="HandleFilterChanged" />

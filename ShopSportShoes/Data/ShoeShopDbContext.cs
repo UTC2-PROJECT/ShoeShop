@@ -41,6 +41,11 @@ namespace ShopSportShoes.Data
               .HasForeignKey(ss => ss.ShoeId)
               .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Order>().HasMany<OrderDetails>(s => s.OrdersDetails)
+             .WithOne(s => s.OrderNavigation)
+             .HasForeignKey(ss => ss.OrderId)
+             .OnDelete(DeleteBehavior.Cascade);
+
             base.OnModelCreating(modelBuilder);
         }
     }

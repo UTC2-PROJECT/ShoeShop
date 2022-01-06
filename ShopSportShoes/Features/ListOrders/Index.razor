@@ -1,78 +1,69 @@
 ﻿@page "/nguoidung/donhang"
 
-<MudCard Class="overflow-hidden" Elevation="25">
-    <MudGrid>
-        <MudItem xs="12">
-            <MudTimeline TimelineOrientation="TimelineOrientation.Horizontal" TimelinePosition="TimelinePosition.Top">
-                <MudTimelineItem Color="Color.Success" Size="MudBlazor.Size.Large">
-                    <ItemDot>
-                        <MudIcon Size="MudBlazor.Size.Large" Icon="@Icons.Filled.ShoppingBag" />
-                    </ItemDot>
-                    <ItemContent>
-                        <MudText Align="Align.Center">Đặt hàng</MudText>
-                    </ItemContent>
-                </MudTimelineItem>
-                <MudTimelineItem Color="Color.Success" Size="MudBlazor.Size.Large">
-                    <ItemDot>
-                        <MudIcon Icon="fas fa-spinner" />
-                    </ItemDot>
-                    <ItemContent>
-                        <MudText Align="Align.Center">Đang xử lý</MudText>
-                    </ItemContent>
-                </MudTimelineItem>
-                <MudTimelineItem Color="Color.Success" Size="MudBlazor.Size.Large">
-                    <ItemDot>
-                        <MudIcon Size="MudBlazor.Size.Large" Icon="fas fa-shuttle-van" Style="font-size:1.5rem;text-align:center;" />
-                    </ItemDot>
-                    <ItemContent>
-                        <MudText Align="Align.Center">Đang giao</MudText>
-                    </ItemContent>
-                </MudTimelineItem>
-                <MudTimelineItem Color="Color.Success" Size="MudBlazor.Size.Large">
-                    <ItemDot>
-                        <MudIcon Size="MudBlazor.Size.Large" Icon="@Icons.Filled.Check" />
-                    </ItemDot>
-                    <ItemContent>
-                        <MudText Align="Align.Center">Đơn hàng đã giao</MudText>
-                    </ItemContent>
-                </MudTimelineItem>
-            </MudTimeline>
-        </MudItem>
-        <MudItem xs="12">
-            <div style="width: 200px; margin-left:auto" class="mt-5">
-                <MudButton FullWidth="true" Variant="Variant.Filled"
-                           DisableElevation="true" Color="Color.Primary">Mua tiếp</MudButton>
-            </div>
-        </MudItem>
-        <MudItem xs="12">
-            <MudGrid Class="mt-5 pb-3" Style="border-top: 3px solid #dbdbdb">
-                <MudItem xs="4" Class="px-3">
-                    <div style="width:90%; height:100%; border-right:3px solid #dbdbdb"
-                         class="d-flex justify-content-center">
-                        Đơn vị giao hàng Express
+@inject OrderRepository OrderRepository
+@inject OrderDetailsRepository OrderDetailsRepository
+
+<MudTable Hover="true" Breakpoint="Breakpoint.Sm" Height="500px" FixedHeader="true"
+          Items="@_ordersDetails"
+          GroupBy="@_groupDefinition"
+          GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
+          GroupFooterClass="mb-4"
+          Dense="true">
+    <HeaderContent>
+        <MudTh><h2>Danh sách đơn hàng của bạn</h2></MudTh>
+        <MudTh>Trạng thái</MudTh>
+        <MudTh>Giá tiền</MudTh>
+    </HeaderContent>
+    <GroupHeaderTemplate>
+        <MudTh Class="mud-table-cell-custom-group" colspan="3"><span style="color:red;">@($"{context.GroupName}: DH{context.Key}")</span></MudTh>
+    </GroupHeaderTemplate>
+    <RowTemplate>
+        <MudTd>
+            <a href="/sanpham/@context.ShoeId">
+                <div class="d-flex align-items-center mb-3" style="width:100%;">
+                    <MudBadge Content="@(context.Quantity)" Color="Color.Primary" Overlap="true">
+                        <div style="border-radius: 5px; border: 1px solid #c3c3c3; width: 66px; height: 66px; overflow:hidden;"
+                             class="d-flex align-items-center justify-content-center">
+                            <img style="object-fit:cover; width:100%;" src="@context?.ShoeNavigation?.ImagesNavigation?.FirstOrDefault()?.ImageSource" />
+                        </div>
+                    </MudBadge>
+                    <div class="d-flex align-items-center justify-content-between ml-3" style="width:100%;">
+                        <div class="d-flex align-items-start justify-content-center flex-column" style="width: 100%;">
+                            <span style="font-size:1rem;" class="text-hiding">@context?.ShoeNavigation?.Title</span>
+                            <span style="color:#c3c3c3">Size: @context?.Size</span>
+                        </div>
+                        @*<span style="margin-left:auto; display:block;">@string.Format("{0:#,##0}đ", context?.IntoMoney)</span>*@
                     </div>
-                </MudItem>
-                <MudItem xs="8">
-                    <MudTimeline TimelinePosition="TimelinePosition.Left">
-                        <MudTimelineItem Color="Color.Primary">
-                            <MudText>10:30AM 03-04-2021 Giao kiện hàng thành công</MudText>
-                        </MudTimelineItem>
-                        <MudTimelineItem>
-                            <MudText>7:30AM 02-04-2021 Lấy hàng thành công đang đi giao</MudText>
-                        </MudTimelineItem>
-                        <MudTimelineItem>
-                            <MudText>4:30PM 01-04-2021 Đơn hàng đã giao đến kho</MudText>
-                        </MudTimelineItem>
-                        <MudTimelineItem>
-                            <MudText>6:30PM 01-04-2021 Đơn hàng đang đóng gói</MudText>
-                        </MudTimelineItem>
-                    </MudTimeline>
-                </MudItem>
-            </MudGrid>
-        </MudItem>
-    </MudGrid>
-</MudCard>
+                </div>
+            </a>
+        </MudTd>
+        <MudTd>@context?.OrderNavigation?.State</MudTd>
+        <MudTd>@string.Format("{0:#,##0}đ", context?.IntoMoney)</MudTd>
+    </RowTemplate>
+    <GroupFooterTemplate>
+        <MudTh Class="mud-table-cell-custom-group mud-table-cell-custom-group-footer"  colspan="3">
+            <div class="d-flex justify-content-center align-items-center my-3">
+                <strong >Thành tiền: @string.Format("{0:#,##0}đ", context.Items.Sum((e) => e.IntoMoney)) </strong>
+            </div>
+        </MudTh>
+    </GroupFooterTemplate>
+</MudTable>
 
 @code {
+    [CascadingParameter(Name = "UserCascaded")] public User UserCascaded { get; set; }
+    List<OrderDetails> _ordersDetails = new();
 
+    protected override void OnInitialized()
+    {
+        _ordersDetails = OrderDetailsRepository.GetFilterCustomize(x => x.UserId == UserCascaded.Id && x.OrderId != null);
+        base.OnInitialized();
+    }
+
+    private TableGroupDefinition<OrderDetails> _groupDefinition = new()
+    {
+        GroupName = "Đơn hàng",
+        Indentation = false,
+        Expandable = false,
+        Selector = (e) => e.OrderId
+    };
 }

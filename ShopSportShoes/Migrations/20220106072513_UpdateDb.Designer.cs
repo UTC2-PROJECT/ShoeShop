@@ -10,8 +10,8 @@ using ShopSportShoes.Data;
 namespace ShopSportShoes.Migrations
 {
     [DbContext(typeof(ShoeShopDbContext))]
-    [Migration("20220105093241_InitDb")]
-    partial class InitDb
+    [Migration("20220106072513_UpdateDb")]
+    partial class UpdateDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -56,14 +56,12 @@ namespace ShopSportShoes.Migrations
                         .HasColumnType("NUMBER(10)")
                         .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ImageName")
-                        .HasColumnType("NVARCHAR2(2000)");
+                    b.Property<string>("ImageSource")
+                        .HasMaxLength(2147483647)
+                        .HasColumnType("NCLOB");
 
                     b.Property<int>("ShoeId")
                         .HasColumnType("NUMBER(10)");
-
-                    b.Property<string>("ThumbnailLink")
-                        .HasColumnType("NVARCHAR2(2000)");
 
                     b.HasKey("Id");
 
@@ -95,6 +93,9 @@ namespace ShopSportShoes.Migrations
                         .HasColumnType("NUMBER(1)");
 
                     b.Property<string>("PhoneNumber")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<string>("State")
                         .HasColumnType("NVARCHAR2(2000)");
 
                     b.Property<double>("TotalPrice")
@@ -144,6 +145,29 @@ namespace ShopSportShoes.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("OrderDetails");
+                });
+
+            modelBuilder.Entity("ShopSportShoes.Models.OrderProgress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("NUMBER(10)")
+                        .HasAnnotation("Oracle:ValueGenerationStrategy", OracleValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Content")
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("TIMESTAMP(7)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("NUMBER(10)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderProgress");
                 });
 
             modelBuilder.Entity("ShopSportShoes.Models.Shoe", b =>
@@ -300,7 +324,8 @@ namespace ShopSportShoes.Migrations
                 {
                     b.HasOne("ShopSportShoes.Models.Order", "OrderNavigation")
                         .WithMany("OrdersDetails")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ShopSportShoes.Models.Shoe", "ShoeNavigation")
                         .WithMany()
@@ -317,6 +342,17 @@ namespace ShopSportShoes.Migrations
                     b.Navigation("ShoeNavigation");
 
                     b.Navigation("UserNavigation");
+                });
+
+            modelBuilder.Entity("ShopSportShoes.Models.OrderProgress", b =>
+                {
+                    b.HasOne("ShopSportShoes.Models.Order", "OrderNavigation")
+                        .WithMany("OrderProgressesNavigation")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrderNavigation");
                 });
 
             modelBuilder.Entity("ShopSportShoes.Models.Shoe", b =>
@@ -351,6 +387,8 @@ namespace ShopSportShoes.Migrations
 
             modelBuilder.Entity("ShopSportShoes.Models.Order", b =>
                 {
+                    b.Navigation("OrderProgressesNavigation");
+
                     b.Navigation("OrdersDetails");
                 });
 

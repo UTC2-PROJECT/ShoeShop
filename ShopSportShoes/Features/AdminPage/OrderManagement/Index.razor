@@ -11,7 +11,7 @@
               Height="70vh" FixedFooter="true" FixedHeader="true">
         <ToolBarContent>
             @*<MudButton OnClick="() => ShowDialogForm(isEdit: false)"
-                       Color="Color.Primary" Variant="Variant.Outlined">Thêm tài khoản</MudButton>*@
+                Color="Color.Primary" Variant="Variant.Outlined">Thêm tài khoản</MudButton>*@
             <MudSpacer />
             <MudSpacer />
             <MudSpacer />
@@ -22,7 +22,7 @@
             <MudTh><MudTableSortLabel SortLabel="datecreated_field" T="Order">Ngày tạo</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="user_field" T="Order">Khách hàng</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="email_field" T="Order">Email</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortLabel="address_field" T="Order">Địa chỉ</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="address_field" T="Order">Địa chỉ giao hàng</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="phonenumber_field" T="Order">Số điện thoại</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="state_field" T="Order">Tình trạng</MudTableSortLabel></MudTh>
             <MudTh>Action</MudTh>
@@ -33,19 +33,34 @@
             <MudTd DataLabel="Email">@context?.Email</MudTd>
             <MudTd DataLabel="Address">@context?.Address</MudTd>
             <MudTd DataLabel="PhoneNumber">@context?.PhoneNumber</MudTd>
-            <MudTd DataLabel="State"></MudTd>
+            <MudTd DataLabel="State">
+                <MudSelect T="string" OffsetY="true" Direction="Direction.Bottom"
+                           Variant="Variant.Outlined" @bind-Value="context.State"
+                           Margin="Margin.Dense" Dense="true">
+                    <MudSelectItem Value="@("Đang xử lý")"/>
+                    <MudSelectItem Value="@("Đang giao")"/>
+                    <MudSelectItem Value="@("Đã giao")"/>
+                </MudSelect>
+            </MudTd>
             <MudTd>
                 <div class="d-flex justify-content-center justify-content-center">
-                    <MudTooltip Text="Chỉnh sửa">
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Class="mx-1"
-                                       Color="Color.Warning" Size="MudBlazor.Size.Small"
-                                       OnClick="() => ShowDialogForm(isEdit:true, user: context)" />
-                    </MudTooltip>
-                    <MudTooltip Text="Huỷ đơn">
-                        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Class="mx-1"
-                                       Color="Color.Error" Size="MudBlazor.Size.Small"
-                                       OnClick="() => HandleDelete(context)" />
-                    </MudTooltip>
+                    @if (context.IsCanceled)
+                    {
+                        <MudButton Variant="Variant.Outlined" Disabled="true"
+                                   Color="Color.Dark" Size="MudBlazor.Size.Small">Đã huỷ</MudButton>
+                    }
+                    else if (context.IsPaid)
+                    {
+                        <MudButton Variant="Variant.Outlined" Disabled="true"
+                                   Color="Color.Success" Size="MudBlazor.Size.Small">Đã giao</MudButton>
+                    }
+                    else
+                    {
+                        <MudTooltip Text="Huỷ đơn">
+                            <MudButton OnClick="() => HandleOrderCancel(context)" Variant="Variant.Outlined"
+                                       Color="Color.Error" Size="MudBlazor.Size.Small">Huỷ đơn</MudButton>
+                        </MudTooltip>
+                    }
                 </div>
             </MudTd>
         </RowTemplate>
@@ -77,6 +92,13 @@
     protected override void OnInitialized()
     {
         _orders = OrderRepository.GetAllCustom();
+        //_orders = await OrderRepository.GetAllAsync();
+    }
+
+    void HandleOrderCancel(Order order)
+    {
+        order.IsCanceled = true;
+
     }
 
     async Task<TableData<Order>> ServerReload(TableState state)
@@ -87,11 +109,7 @@
         {
             if (string.IsNullOrWhiteSpace(_searchString))
                 return true;
-            if (element.Address.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-            if (element.PhoneNumber.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-                return true;
-            if ($"{element.Address} {element.Email} {element.PhoneNumber}".Contains(_searchString))
+            if ($"{element.Address} {element.Email} {element?.PhoneNumber ?? ""}".Contains(_searchString))
                 return true;
             return false;
         }).ToList();

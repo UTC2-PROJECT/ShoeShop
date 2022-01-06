@@ -124,7 +124,8 @@
                 DateCreated = DateTime.Now,
                 TotalPrice = _ordersDetails.Sum(x => x.IntoMoney),
                 PhoneNumber = _order.PhoneNumber,
-                Address = _order.Address
+                Address = _order.Address,
+                Email = UserCascaded.Email
             };
             var orderAdded = await OrderRepository.AddAsync(newOrder);
 

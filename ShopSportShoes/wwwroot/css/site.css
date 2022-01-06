@@ -78,7 +78,7 @@ a, .btn-link {
 
 .text-hiding {
     line-height: 1.5em;
-    height: 3em;
+    height: 2em;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

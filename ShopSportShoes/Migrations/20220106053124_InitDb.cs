@@ -84,6 +84,7 @@ namespace ShopSportShoes.Migrations
                     Email = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     Address = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    State = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
                     IsPaid = table.Column<bool>(type: "NUMBER(1)", nullable: false),
                     IsCanceled = table.Column<bool>(type: "NUMBER(1)", nullable: false),
                     UserId = table.Column<int>(type: "NUMBER(10)", nullable: true)
@@ -133,8 +134,7 @@ namespace ShopSportShoes.Migrations
                 {
                     Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    ImageName = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
-                    ThumbnailLink = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    ImageSource = table.Column<string>(type: "NCLOB", maxLength: 2147483647, nullable: true),
                     ShoeId = table.Column<int>(type: "NUMBER(10)", nullable: false)
                 },
                 constraints: table =>
@@ -210,6 +210,27 @@ namespace ShopSportShoes.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "OrderProgress",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
+                    Content = table.Column<string>(type: "NVARCHAR2(2000)", nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
+                    OrderId = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderProgress", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderProgress_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Evolutions_ShoeId",
                 table: "Evolutions",
@@ -239,6 +260,11 @@ namespace ShopSportShoes.Migrations
                 name: "IX_OrderDetails_UserId",
                 table: "OrderDetails",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderProgress_OrderId",
+                table: "OrderProgress",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserId",
@@ -271,6 +297,9 @@ namespace ShopSportShoes.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrderDetails");
+
+            migrationBuilder.DropTable(
+                name: "OrderProgress");
 
             migrationBuilder.DropTable(
                 name: "ShoeSizes");
