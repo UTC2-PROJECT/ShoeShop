@@ -48,12 +48,13 @@
                         <tr>
                             <td>@(_ordersDetails.FindIndex(x => x.Id == context.Id) + 1)</td>
                             <td>
-                                <a href="@($"/sanpham/{context.ShoeId}")" style="text-decoration:none;">
-                                    <div class="d-flex align-items-center justify-content-start" style="width:100%;">
+                                <a href="@($"/sanpham/{context.ShoeId}")" style="text-decoration:none; ">
+                                    <div class="d-flex align-items-center justify-content-start" style="width: 100%;">
                                         <div style="height:100px; width:100px;" class="d-flex align-items-center justify-content-center">
                                             <img style="width:100%; object-fit:contain;" src="@context?.ShoeNavigation?.ImagesNavigation?.FirstOrDefault()?.ImageSource" />
                                         </div>
-                                        <div class="d-flex flex-column justify-content-center align-items-start ml-2">
+                                        <div class="d-flex flex-column justify-content-center align-items-start ml-2"
+                                             style="width:321px; overflow:hidden;">
                                             <p class="ma-0 text-hiding">@context?.ShoeNavigation?.Title</p>
                                             <p class="ma-0 d-flex align-items-center" style="white-space:nowrap">Loại: @context?.ShoeNavigation?.ShoeCatalogNavigation?.Name | Thương hiệu:@context?.ShoeNavigation?.Trademark </p>
                                             <p class="ma-0 mt-2 font-weight-bold" style="color:red;">@string.Format("{0:#,##0} đ", @context?.ShoeNavigation?.Price)</p>
@@ -139,7 +140,7 @@ else
 
     protected override void OnInitialized()
     {
-        _ordersDetails = OrderDetailsRepository.GetFilterCustomize(x => x.OrderId == null);
+        _ordersDetails = OrderDetailsRepository.GetFilterCustomize(x => x.OrderId == null && x.UserId == UserCascaded.Id);
     }
 
     async Task DeleteOrderDetails(OrderDetails orderDetails)

@@ -1,8 +1,26 @@
 ﻿
+<style>
+    .account-dropdown {
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 0;
+        width: 100%;
+    }
+    
+</style>
+
 <AuthorizeView>
     <Authorized>
-        Hello, @context.User.Identity.Name!
-        <MudLink Href="Identity/Account/Logout" Underline="Underline.None" Class="mx-3">Đăng xuất</MudLink>
+        <div class="d-flex align-items-center">
+            <div>Hello, @context.User.Identity.Name!
+                <div class="account-dropdown d-flex flex-column">
+                    <div class="d-flex align-items-center">
+                        
+                    </div>
+                </div>
+            </div>
+            <MudLink Href="Identity/Account/Logout" Underline="Underline.None" Class="mx-3">Đăng xuất</MudLink>
+        </div>
     </Authorized>
     <NotAuthorized>
         <MudMenu OffsetY="true" Direction="Direction.Bottom">
@@ -23,8 +41,6 @@
 </AuthorizeView>
 
 @code{
-   
     [Parameter] public bool LockCart { get; set; }
-
-   
+    
 }

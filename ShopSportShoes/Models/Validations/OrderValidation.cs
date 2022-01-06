@@ -11,6 +11,9 @@ namespace ShopSportShoes.Models.Validations
         public OrderValidation()
         {
             RuleFor(x => x.PhoneNumber).NotEmpty().WithMessage("Số điện thoại không được trống");
+            RuleFor(x => x.PhoneNumber).Matches("^[0-9]*$").WithMessage("Số điện thoại phải toàn số");
+            RuleFor(x => x.PhoneNumber).MaximumLength(11).WithMessage("Số điện thoại không được lớn hơn 11 số");
+            RuleFor(x => x.PhoneNumber).MinimumLength(10).WithMessage("Số điện thoại không được bé hơn 10 số");
             RuleFor(x => x.Address).NotEmpty().WithMessage("Địa chỉ không được trống");
         }
 

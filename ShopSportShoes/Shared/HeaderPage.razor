@@ -36,7 +36,7 @@
                                 <img src="@item?.ImagesNavigation?.FirstOrDefault()?.ImageSource" style="object-fit:contain; width:100%;" />
                             </MudCard>
                             <div class="w-100 d-flex flex-wrap align-items-center justify-content-start" Style="height:80px">
-                                <p class="ma-0 w-100 font-weight-bold" style="color:red;"><MudHighlighter Text="@item.Title" HighlightedText="@_textSearch" /></p>
+                                <p class="ma-0 w-100 font-weight-bold" style="color:black;"><MudHighlighter Text="@item.Title" HighlightedText="@_textSearch" /></p>
                                 <p class="ma-0 w-100" style="color: #b7b7b7"><MudHighlighter Text="@($"Loại: {item?.ShoeCatalogNavigation?.Name} | Thương hiệu: {@item?.Trademark}")" HighlightedText="@_textSearch" /></p>
                                 <p class="ma-0 w-100 font-weight-bold" style="color: #b90b0b;">@string.Format("{0:#,##0} đ", item.Price)</p>
                             </div>

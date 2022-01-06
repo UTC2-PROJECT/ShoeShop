@@ -15,5 +15,16 @@ namespace ShopSportShoes.Repositories
         {
             _contextFactory = context;
         }
+
+        public List<Order> GetAllCustom()
+        {
+            var context = _contextFactory.CreateDbContext();
+            return context.Orders.Include(x => x.OrdersDetails)
+                                    .ThenInclude(x => x.ShoeNavigation.ImagesNavigation)
+                                 .Include(x => x.OrdersDetails)
+                                    .ThenInclude(x => x.ShoeNavigation.ShoeCatalogNavigation)
+                                 .Include(x => x.UserNavigation)
+                                 .ToList();
+        }
     }
 }

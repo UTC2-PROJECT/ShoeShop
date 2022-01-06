@@ -8,7 +8,7 @@
     <MudItem xs="5">
         <div class="w-100">
             <MudCard Style="height: 500px; overflow: hidden; position: relative; display: flex; align-items: center; ">
-                <img src="./images/Shoes/@(_presentImage ?? Shoe?.ImagesNavigation?.FirstOrDefault()?.ImageSource)"
+                <img src="@(_presentImage ?? Shoe?.ImagesNavigation?.FirstOrDefault()?.ImageSource)"
                      style="object-fit: cover; width: 100%; cursor: pointer;" @onclick="() => {
                                                                            _imgSrcOveray = _presentImage ?? Shoe?.ImagesNavigation?.FirstOrDefault()?.ImageSource;
                                                                            _isOverlay = true;
@@ -18,7 +18,7 @@
                 @foreach (var item in Shoe.ImagesNavigation)
                 {
                     <MudCard Style="width:100px; height:100px;" Class="ma-2 d-flex align-items-center">
-                        <img loading="lazy" src="./images/Shoes/@item.ImageSource" style="object-fit:contain;width:100%; cursor:pointer;" @onclick="() => SwitchImage(item.ImageSource)" />
+                        <img loading="lazy" src="@item.ImageSource" style="object-fit:contain;width:100%; cursor:pointer;" @onclick="() => SwitchImage(item.ImageSource)" />
                     </MudCard>
                 }
             </div>
@@ -108,9 +108,14 @@
                 ShoeId = Shoe.Id,
                 IntoMoney = Shoe.Price * _quantity,
                 Quantity = _quantity,
-                Size = _chipSizeSeleted.Text,
-                UserId = UserCascaded.Id
+                Size = _chipSizeSeleted.Text
             };
+
+            if (UserCascaded.Id != 0)
+            {
+                orderDetails.UserId = UserCascaded.Id;
+            }
+
             await OrderDetailsRepository.AddAsync(orderDetails);
 
             OrderRealtimeService.UpdateCart();
@@ -118,7 +123,7 @@
         }
         else
         {
-            Snackbar.Add("Chưa chọn size giày",Severity.Info);
+            Snackbar.Add("Chưa chọn size giày", Severity.Info);
         }
     }
 
