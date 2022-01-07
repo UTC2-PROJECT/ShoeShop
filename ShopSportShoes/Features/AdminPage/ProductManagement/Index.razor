@@ -100,7 +100,9 @@
 
     async Task HandleDelete(Shoe shoe)
     {
-        var dialog = DialogService.Show<DeleteFormModal>("Sản phẩm sẽ bị xoá vĩnh viễn !!!");
+        DialogParameters parameters = new();
+        parameters.Add("OkText", "Xoá");
+        var dialog = DialogService.Show<DeleteFormModal>("Sản phẩm sẽ bị xoá vĩnh viễn !!!",parameters);
 
         var result = await dialog.Result;
 

@@ -21,9 +21,9 @@ namespace ShopSportShoes.Repositories
         {
             var context = _contextFactory.CreateDbContext();
             return context.OrderDetails.Where(filter)
+                                       .Include(x => x.OrderNavigation)
                                        .Include(x => x.ShoeNavigation.ImagesNavigation)
                                        .Include(x => x.ShoeNavigation.ShoeCatalogNavigation)
-                                       .Include(x => x.OrderNavigation)
                                        .ToList();
         }
 

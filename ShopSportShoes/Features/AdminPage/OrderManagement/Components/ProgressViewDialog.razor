@@ -1,0 +1,83 @@
+﻿@inject OrderProgressRepository OrderProgressRepository
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <h2 style="text-align:center;">Tiến độ đơn hàng</h2>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                <div class="d-flex align-items-center">
+                    <MudTextField T="string" Label="Nhập tiến độ" Margin="Margin.Dense"
+                                  @bind-Value="@_progressText" Variant="Variant.Outlined" FullWidth="true" />
+                    <MudTooltip Text="Nhấn để thêm">
+                        <MudIconButton Icon="@Icons.Filled.Add" Size="MudBlazor.Size.Medium" Color="Color.Success"
+                                       OnClick="AddProgress" Class="mx-3"></MudIconButton>
+                    </MudTooltip>
+                </div>
+            </MudItem>
+            <MudItem xs="12">
+                @if (Order.OrderProgressesNavigation.Count <= 0)
+                {
+                    <div class="d-flex justify-content-center align-items-center font-weight-bold" style="font-size:1.5rem">
+                        Chưa cập nhật tiến độ
+                    </div>
+                }
+                else
+                {
+                    <MudTimeline TimelinePosition="TimelinePosition.Left">
+                        @foreach (var item in Order.OrderProgressesNavigation.OrderByDescending(x => x.DateCreated).ToList())
+                        {
+                            <MudTimelineItem Color="@(Order.OrderProgressesNavigation?.First()?.Id == item.Id ? Color.Primary : Color.Default)">
+                                <div class="d-flex">
+                                    <MudText>@item.DateCreated @item.Content</MudText>
+                                    <MudIconButton Icon="@Icons.Filled.Delete" Size="MudBlazor.Size.Small"
+                                                   OnClick="() => DeleteProgress(item)" Color="Color.Error"></MudIconButton>
+                                </div>
+                            </MudTimelineItem>
+                        }
+                    </MudTimeline>
+                }
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Thoát</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialogInstance { get; set; }
+    [Parameter] public Order Order { get; set; }
+
+    void Cancel() => MudDialogInstance.Cancel();
+    void Submit() => MudDialogInstance.Close(DialogResult.Ok(true));
+
+    string _progressText;
+
+    async Task DeleteProgress(OrderProgress orderProgress)
+    {
+        await OrderProgressRepository.DeleteAsync(orderProgress.Id);
+        Order.OrderProgressesNavigation.Remove(orderProgress);
+    }
+
+    async Task AddProgress()
+    {
+        if (!string.IsNullOrEmpty(_progressText))
+        {
+            OrderProgress progress = new()
+            {
+                DateCreated = DateTime.Now,
+                Content = _progressText,
+                OrderId = Order.Id
+            };
+            await OrderProgressRepository.AddAsync(progress);
+            Order.OrderProgressesNavigation.Insert(0, progress);
+        }
+        else
+        {
+            Snackbar.Add("Thông tin không được trống", Severity.Info);
+        }
+    }
+}

@@ -3,12 +3,22 @@
 @inject OrderRepository OrderRepository
 @inject IDialogService DialogService
 
-@using ShopSportShoes.Features.AdminPage.OrderManagement
+@using ShopSportShoes.Features.AdminPage.OrderManagement.Components
 
 <div style="position:relative">
     <MudTable ServerData="@(new Func<TableState, Task<TableData<Order>>>(ServerReload))"
               Dense="true" Hover="true" @ref="_mudTable" Virtualize="true"
               Height="70vh" FixedFooter="true" FixedHeader="true">
+        <ColGroup>
+            <col />
+            <col />
+            <col />
+            <col />
+            <col />
+            <col style="width:200px;" />
+            <col />
+            <col />
+        </ColGroup>
         <ToolBarContent>
             @*<MudButton OnClick="() => ShowDialogForm(isEdit: false)"
                 Color="Color.Primary" Variant="Variant.Outlined">Thêm tài khoản</MudButton>*@
@@ -25,6 +35,7 @@
             <MudTh><MudTableSortLabel SortLabel="address_field" T="Order">Địa chỉ giao hàng</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="phonenumber_field" T="Order">Số điện thoại</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="state_field" T="Order">Tình trạng</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="state_field" T="Order">Tiến độ</MudTableSortLabel></MudTh>
             <MudTh>Action</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -35,12 +46,18 @@
             <MudTd DataLabel="PhoneNumber">@context?.PhoneNumber</MudTd>
             <MudTd DataLabel="State">
                 <MudSelect T="string" OffsetY="true" Direction="Direction.Bottom"
-                           Variant="Variant.Outlined" @bind-Value="context.State"
-                           Margin="Margin.Dense" Dense="true">
-                    <MudSelectItem Value="@("Đang xử lý")"/>
-                    <MudSelectItem Value="@("Đang giao")"/>
-                    <MudSelectItem Value="@("Đã giao")"/>
+                           Variant="Variant.Outlined" Value="context.State" ValueChanged="(e) => UpdateState(e, context)"
+                           Margin="Margin.Dense" Dense="true" Disabled="(context.IsCanceled)">
+                    <MudSelectItem Value="@("Đang xử lý")" />
+                    <MudSelectItem Value="@("Đang giao")" />
+                    <MudSelectItem Value="@("Đã giao")" />
                 </MudSelect>
+            </MudTd>
+            <MudTd DataLabel="State">
+                <MudTooltip Text="@("Xem tiến độ")">
+                    <MudIconButton Icon="@Icons.Filled.RemoveRedEye" Size="MudBlazor.Size.Small"
+                                   Color="Color.Primary" OnClick="() => ShowProgressDialog(context)" />
+                </MudTooltip>
             </MudTd>
             <MudTd>
                 <div class="d-flex justify-content-center justify-content-center">
@@ -49,7 +66,7 @@
                         <MudButton Variant="Variant.Outlined" Disabled="true"
                                    Color="Color.Dark" Size="MudBlazor.Size.Small">Đã huỷ</MudButton>
                     }
-                    else if (context.IsPaid)
+                    else if (context.State == "Đã giao")
                     {
                         <MudButton Variant="Variant.Outlined" Disabled="true"
                                    Color="Color.Success" Size="MudBlazor.Size.Small">Đã giao</MudButton>
@@ -95,10 +112,33 @@
         //_orders = await OrderRepository.GetAllAsync();
     }
 
-    void HandleOrderCancel(Order order)
+    async Task ShowProgressDialog(Order order)
     {
-        order.IsCanceled = true;
+        DialogOptions options = new() { DisableBackdropClick = true };
+        DialogParameters parameters = new();
+        parameters.Add("Order", order);
+        var dialog = DialogService.Show<ProgressViewDialog>("Tiến độ đơn hàng", parameters, options);
+        var result = await dialog.Result;
+    }
 
+    void UpdateState(string state, Order order)
+    {
+        order.State = state;
+        OrderRepository.Update(order);
+    }
+
+    async Task HandleOrderCancel(Order order)
+    {
+        DialogParameters parameters = new();
+        parameters.Add("OkText", "Vẫn huỷ");
+        var dialog = DialogService.Show<DeleteFormModal>("Bạn muốn huỷ đơn hàng này", parameters);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            order.IsCanceled = true;
+            OrderRepository.Update(order);
+        }
     }
 
     async Task<TableData<Order>> ServerReload(TableState state)

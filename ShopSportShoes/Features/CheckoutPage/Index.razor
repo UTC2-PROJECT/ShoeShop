@@ -59,7 +59,7 @@
             <MudItem xs="4">
                 <MudGrid>
                     <MudItem xs="12">
-                        @foreach (var item in _ordersDetails)
+                        @foreach (var item in _ordersDetails.OrderByDescending(x => x.OrderNavigation.DateCreated).ToList())
                         {
                             <ShoeItem OrderDetails="item" />
                         }
@@ -125,7 +125,8 @@
                 TotalPrice = _ordersDetails.Sum(x => x.IntoMoney),
                 PhoneNumber = _order.PhoneNumber,
                 Address = _order.Address,
-                Email = UserCascaded.Email
+                Email = UserCascaded.Email,
+                State = "Đang xử lý",
             };
             var orderAdded = await OrderRepository.AddAsync(newOrder);
 

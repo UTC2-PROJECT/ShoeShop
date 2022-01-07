@@ -74,7 +74,7 @@ namespace ShopSportShoes
             // Add services
             services.AddMudServices();
 
-            services.AddScoped<GoogleDriveService>();
+            services.AddSingleton<GoogleDriveService>();
             services.AddSingleton<ShoeConfigService>();
             services.AddScoped<UserManagerService>();
 
@@ -90,6 +90,7 @@ namespace ShopSportShoes
             services.AddSingleton<ShoeCatalogRepository>();
             services.AddSingleton<OrderRepository>();
             services.AddSingleton<OrderDetailsRepository>();
+            services.AddSingleton<OrderProgressRepository>();
             services.AddSingleton<ImageFileService>();
 
 
