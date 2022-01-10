@@ -27,7 +27,7 @@
 </MudGrid>
 
 @code {
-   
+
     List<Shoe> _shoes = new();
     List<string> _listTrademarksChecked = new();
     List<string> _listSizesChecked = new();
@@ -42,7 +42,6 @@
     {
         _isLoading = true;
         _shoes = await ShoeRepository.GetAllLoadingAsync();
-
         _filterCondition.Or(x => true);
         _isLoading = false;
     }
@@ -52,9 +51,10 @@
         _filterCondition = PredicateBuilder.New<Shoe>();
         foreach (var item in expressions)
         {
-            _filterCondition.Or(item);
+            _filterCondition.And(item);
         }
     }
+
     void HandleSortChange(string value)
     {
         switch (value)

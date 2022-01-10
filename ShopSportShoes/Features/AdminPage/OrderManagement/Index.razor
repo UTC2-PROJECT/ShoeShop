@@ -50,7 +50,7 @@
                            Margin="Margin.Dense" Dense="true" Disabled="(context.IsCanceled)">
                     <MudSelectItem Value="@("Đang xử lý")" />
                     <MudSelectItem Value="@("Đang giao")" />
-                    <MudSelectItem Value="@("Đã giao")" />
+                    <MudSelectItem Value="@("Đã giao thành công")" />
                 </MudSelect>
             </MudTd>
             <MudTd DataLabel="State">
@@ -66,7 +66,7 @@
                         <MudButton Variant="Variant.Outlined" Disabled="true"
                                    Color="Color.Dark" Size="MudBlazor.Size.Small">Đã huỷ</MudButton>
                     }
-                    else if (context.State == "Đã giao")
+                    else if (context.State == "Đã giao thành công")
                     {
                         <MudButton Variant="Variant.Outlined" Disabled="true"
                                    Color="Color.Success" Size="MudBlazor.Size.Small">Đã giao</MudButton>

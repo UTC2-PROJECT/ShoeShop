@@ -29,7 +29,7 @@
                     <MudTimeline TimelinePosition="TimelinePosition.Left">
                         @foreach (var item in Order.OrderProgressesNavigation.OrderByDescending(x => x.DateCreated).ToList())
                         {
-                            <MudTimelineItem Color="@(Order.OrderProgressesNavigation?.First()?.Id == item.Id ? Color.Primary : Color.Default)">
+                            <MudTimelineItem Color="@(item.DateCreated == _maxDateCreated ? Color.Primary : Color.Default)">
                                 <div class="d-flex">
                                     <MudText>@item.DateCreated @item.Content</MudText>
                                     <MudIconButton Icon="@Icons.Filled.Delete" Size="MudBlazor.Size.Small"
@@ -50,6 +50,8 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialogInstance { get; set; }
     [Parameter] public Order Order { get; set; }
+
+    DateTime _maxDateCreated => Order.OrderProgressesNavigation.Max(x => x.DateCreated);
 
     void Cancel() => MudDialogInstance.Cancel();
     void Submit() => MudDialogInstance.Close(DialogResult.Ok(true));

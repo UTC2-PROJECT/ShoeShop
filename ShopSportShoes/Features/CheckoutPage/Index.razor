@@ -59,7 +59,7 @@
             <MudItem xs="4">
                 <MudGrid>
                     <MudItem xs="12">
-                        @foreach (var item in _ordersDetails.OrderByDescending(x => x.OrderNavigation.DateCreated).ToList())
+                        @foreach (var item in _ordersDetails.OrderByDescending(x => x?.OrderNavigation?.DateCreated).ToList())
                         {
                             <ShoeItem OrderDetails="item" />
                         }

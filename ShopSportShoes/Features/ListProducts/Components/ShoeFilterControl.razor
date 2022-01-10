@@ -8,7 +8,7 @@
             <strong>Khoảng giá</strong>
         </TitleContent>
         <ChildContent>
-            <MudRadioGroup @bind-SelectedOption="@_priceRangeSelected">
+            <MudRadioGroup T="string" SelectedOption="@_priceRangeSelected" SelectedOptionChanged="@((e) => HandleChecked(true,e,"price"))">
                 @foreach (var item in _priceRanges)
                 {
                     <MudRadio Color="Color.Primary" Option="@(item)">@item</MudRadio>
@@ -42,15 +42,16 @@
 
 @code {
 
+    //[Parameter] public Func<Shoe, bool> Filter { get; set; }
+    //[Parameter] public EventCallback<Func<Shoe, bool>> FilterChanged { get; set; }
     [Parameter] public EventCallback<List<ExpressionStarter<Shoe>>> FilterChanged { get; set; }
-
-    List<ExpressionStarter<Shoe>> _listConditions = new();
 
     List<string> _priceRanges = new();
     List<string> _trademarks = new();
     List<string> _sizeNames = new();
     List<string> _listTrademarksChecked = new();
     List<string> _listSizesChecked = new();
+    List<ExpressionStarter<Shoe>> _listConditions = new();
 
     string _priceRangeSelected;
 
@@ -66,34 +67,44 @@
         _priceRanges = ShoeConfigService.GetAll().PriceRanges;
     }
 
-    async Task HandleChecked(bool value, string item, string label)
+
+    async Task HandleChecked(bool value, string item = null, string label = null)
     {
         _listConditions = new();
-        if (value)
+
+        if (label != "price")
         {
-            if (label == "trademark")
+            if (value)
             {
-                if(!_listTrademarksChecked.Any(x => x == item))
-                    _listTrademarksChecked.Add(item);
+                if (label == "trademark")
+                {
+                    if (!_listTrademarksChecked.Any(x => x == item))
+                        _listTrademarksChecked.Add(item);
+                }
+                else
+                {
+                    if (!_listSizesChecked.Any(x => x == item))
+                        _listSizesChecked.Add(item);
+                }
             }
             else
             {
-                if (!_listSizesChecked.Any(x => x == item))
-                    _listSizesChecked.Add(item);
+                if (label == "trademark")
+                {
+                    _listTrademarksChecked.RemoveAll(x => x == item);
+                }
+                else
+                {
+                    _listSizesChecked.RemoveAll(x => x == item);
+                }
             }
         }
         else
         {
-            if (label == "trademark")
-            {
-                _listTrademarksChecked.RemoveAll(x => x == item);
-            }
-            else
-            {
-                _listTrademarksChecked.RemoveAll(x => x == item);
-            }
+            _priceRangeSelected = item;
         }
-        if (!_listTrademarksChecked.Any() && !_listSizesChecked.Any())
+
+        if (!_listTrademarksChecked.Any() && !_listSizesChecked.Any() && string.IsNullOrEmpty(_priceRangeSelected))
         {
             _listConditions.Add(PredicateBuilder.New<Shoe>(x => true));
         }
@@ -101,16 +112,56 @@
         {
             if (_listTrademarksChecked.Any())
             {
-                _listConditions.Add(PredicateBuilder.New<Shoe>(x => _listTrademarksChecked.Any(c => c == x.Trademark)));
+                _listConditions.Add(PredicateBuilder.New<Shoe>(x => TrademarkChecked(x)));
             }
 
             if (_listSizesChecked.Any())
             {
-                _listConditions.Add(PredicateBuilder.New<Shoe>(x => _listSizesChecked.All(s => x.ShoeSizesNavigation.Any(c => c.SizeNavigation.SizeName == s))));
+                _listConditions.Add(PredicateBuilder.New<Shoe>(x => SizeChecked(x)));
+            }
+
+            if (!string.IsNullOrEmpty(_priceRangeSelected))
+            {
+                _listConditions.Add(PredicateBuilder.New<Shoe>(x => PriceChecked(x)));
             }
         }
 
         await FilterChanged.InvokeAsync(_listConditions);
+    }
+
+    bool SizeChecked(Shoe shoe)
+    {
+        return _listSizesChecked.All(s => shoe.ShoeSizesNavigation.Any(c => c.SizeNavigation.SizeName == s));
+    }
+
+    bool TrademarkChecked(Shoe shoe)
+    {
+        return _listTrademarksChecked.Any(c => c == shoe.Trademark);
+    }
+
+    bool PriceChecked(Shoe shoe)
+    {
+        var priceClean = _priceRangeSelected.Replace(",", "").Replace("đ", "").Replace(",", "");
+
+        if (priceClean.Contains("-"))
+        {
+            var list = priceClean.Split("-");
+            return shoe.Price >= double.Parse(list[0].Trim()) && shoe.Price < double.Parse(list[1].Trim());
+        }
+
+        if (priceClean.Contains("Trên"))
+        {
+            priceClean = priceClean.Replace("Trên", "").Trim();
+            return shoe.Price > double.Parse(priceClean.Trim());
+        }
+
+        if (priceClean.Contains("Dưới"))
+        {
+            priceClean = priceClean.Replace("Dưới", "").Trim();
+            return shoe.Price < double.Parse(priceClean.Trim());
+        }
+
+        return true;
     }
 
 }

@@ -63,7 +63,7 @@
             <div class="d-flex align-items-center mb-3">
                 <MudButton Color="Color.Primary" FullWidth="true"
                            Variant="Variant.Filled"
-                           OnClick="@(() => NavigationManager.NavigateTo("/checkout"))">MUA NGAY</MudButton>
+                           OnClick="BuyNow">MUA NGAY</MudButton>
                 <MudButton Color="Color.Primary" FullWidth="true"
                            Variant="Variant.Outlined" Class="mx-2"
                            OnClick="AddToCart">THÊM VÀO GIỎ</MudButton>
@@ -99,7 +99,7 @@
 
     int _quantity = 1;
 
-    async Task AddToCart()
+    async Task<bool> AddToCart()
     {
         if (_chipSizeSeleted != null)
         {
@@ -120,15 +120,24 @@
 
             OrderRealtimeService.UpdateCart();
             Snackbar.Add("Đã thêm vào giỏ hàng của bạn", Severity.Success);
+            return true;
         }
         else
         {
             Snackbar.Add("Chưa chọn size giày", Severity.Info);
+            return false;
         }
     }
 
     void SwitchImage(string result)
     {
         _presentImage = result;
+    }
+
+    async Task BuyNow()
+    {
+        var check = await AddToCart();
+        if(check)
+            NavigationManager.NavigateTo("/checkout");
     }
 }
