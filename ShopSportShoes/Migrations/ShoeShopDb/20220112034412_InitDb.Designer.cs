@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 using ShopSportShoes.Data;
 
-namespace ShopSportShoes.Migrations
+namespace ShopSportShoes.Migrations.ShoeShopDb
 {
     [DbContext(typeof(ShoeShopDbContext))]
-    [Migration("20220106072513_UpdateDb")]
-    partial class UpdateDb
+    [Migration("20220112034412_InitDb")]
+    partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

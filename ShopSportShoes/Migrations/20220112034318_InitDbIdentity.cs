@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace ShopSportShoes.Migrations.AppDb
+namespace ShopSportShoes.Migrations
 {
-    public partial class InitIdentityDb : Migration
+    public partial class InitDbIdentity : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -155,12 +155,12 @@ namespace ShopSportShoes.Migrations.AppDb
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "214a248e-5048-4e09-ae45-be3251966fc6", "ded1c676-a7a0-40af-b7a2-515a4fdad7a2", "User", "USER" });
+                values: new object[] { "5c046ce0-926e-4a7a-aa5b-910f92d23c80", "1575bffb-d341-4b83-a5ea-4fc4bd1f2ac9", "User", "USER" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "87165092-545d-4a4a-a993-62fe036f1f77", "62f449a7-7793-47d3-892f-deea018b2a00", "Admin", "ADMIN" });
+                values: new object[] { "f24d1e89-472b-4974-bec0-74ca00b8a726", "d6f1fba3-5bca-4818-88be-a0ba970f3a32", "Admin", "ADMIN" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

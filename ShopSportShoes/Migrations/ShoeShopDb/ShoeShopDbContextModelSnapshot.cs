@@ -2,18 +2,16 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 using ShopSportShoes.Data;
 
-namespace ShopSportShoes.Migrations
+namespace ShopSportShoes.Migrations.ShoeShopDb
 {
     [DbContext(typeof(ShoeShopDbContext))]
-    [Migration("20220106053124_InitDb")]
-    partial class InitDb
+    partial class ShoeShopDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -324,7 +322,8 @@ namespace ShopSportShoes.Migrations
                 {
                     b.HasOne("ShopSportShoes.Models.Order", "OrderNavigation")
                         .WithMany("OrdersDetails")
-                        .HasForeignKey("OrderId");
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ShopSportShoes.Models.Shoe", "ShoeNavigation")
                         .WithMany()

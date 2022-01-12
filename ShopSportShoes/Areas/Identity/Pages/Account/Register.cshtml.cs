@@ -82,7 +82,7 @@ namespace ShopSportShoes.Areas.Identity.Pages.Account
             {
                 var user = new IdentityUser { UserName = Input.UserName, Email = Input.Email, EmailConfirmed = true };
                 var result = await _userManager.CreateAsync(user, Input.Password);
-                await _userManager.AddToRoleAsync(user, "User");
+                //await _userManager.AddToRoleAsync(user, "User");
 
                 if (result.Succeeded)
                 {
@@ -109,7 +109,9 @@ namespace ShopSportShoes.Areas.Identity.Pages.Account
             User user = new()
             {
                 Email = Input.Email,
-                Name = Input.UserName
+                Name = Input.UserName,
+                IsAdmin = false,
+                DateOfBirth = DateTime.Now
             };
             await _userRepository.AddAsync(user);
         }

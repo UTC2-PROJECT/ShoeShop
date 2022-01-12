@@ -2,18 +2,16 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Oracle.EntityFrameworkCore.Metadata;
 using ShopSportShoes.Areas.Identity.Data;
 
-namespace ShopSportShoes.Migrations.AppDb
+namespace ShopSportShoes.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20211227101432_InitIdentityDb")]
-    partial class InitIdentityDb
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,15 +48,15 @@ namespace ShopSportShoes.Migrations.AppDb
                     b.HasData(
                         new
                         {
-                            Id = "214a248e-5048-4e09-ae45-be3251966fc6",
-                            ConcurrencyStamp = "ded1c676-a7a0-40af-b7a2-515a4fdad7a2",
+                            Id = "5c046ce0-926e-4a7a-aa5b-910f92d23c80",
+                            ConcurrencyStamp = "1575bffb-d341-4b83-a5ea-4fc4bd1f2ac9",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "87165092-545d-4a4a-a993-62fe036f1f77",
-                            ConcurrencyStamp = "62f449a7-7793-47d3-892f-deea018b2a00",
+                            Id = "f24d1e89-472b-4974-bec0-74ca00b8a726",
+                            ConcurrencyStamp = "d6f1fba3-5bca-4818-88be-a0ba970f3a32",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

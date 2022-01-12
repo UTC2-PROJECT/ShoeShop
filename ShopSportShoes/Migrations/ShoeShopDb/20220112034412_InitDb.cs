@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace ShopSportShoes.Migrations
+namespace ShopSportShoes.Migrations.ShoeShopDb
 {
     public partial class InitDb : Migration
     {
@@ -195,7 +195,7 @@ namespace ShopSportShoes.Migrations
                         column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OrderDetails_Shoes_ShoeId",
                         column: x => x.ShoeId,
