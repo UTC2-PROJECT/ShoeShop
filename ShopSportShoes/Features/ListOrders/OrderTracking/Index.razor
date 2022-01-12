@@ -74,8 +74,8 @@
                         <MudTimeline TimelinePosition="TimelinePosition.Left">
                             @foreach (var item in _order.OrderProgressesNavigation.OrderByDescending(x => x.DateCreated).ToList())
                             {
-                                <MudTimelineItem Color="@(_order.OrderProgressesNavigation?.First()?.Id == item.Id ? Color.Primary : Color.Default)">
-                                    <MudText>@item.DateCreated @item.Content</MudText>
+                                <MudTimelineItem Color="@(item.DateCreated == _maxDateCreated ? Color.Primary : Color.Default)">
+                                    <MudText Color="@(item.DateCreated == _maxDateCreated ? Color.Primary : Color.Default)">@item.DateCreated @item.Content</MudText>
                                 </MudTimelineItem>
                             }
                         </MudTimeline>
@@ -98,6 +98,7 @@
     List<string> _listPorgress = new() { "Đã đặt hàng","Đăng xử lý","Đăng giao","Đơn hàng đã giao"};
 
     Order _order = new();
+    DateTime _maxDateCreated => _order.OrderProgressesNavigation.Max(x => x.DateCreated);
 
     protected override void OnInitialized()
     {

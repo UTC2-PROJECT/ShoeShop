@@ -20,7 +20,8 @@ namespace ShopSportShoes.Repositories
         public async Task<List<Shoe>> GetAllLoadingAsync()
         {
             var context = _contextFactory.CreateDbContext();
-            return await context.Shoes.Include(x => x.ImagesNavigation)
+            return await context.Shoes.OrderByDescending(x => x.Id)
+                                      .Include(x => x.ImagesNavigation)
                                       .Include(x => x.ShoeSizesNavigation)
                                         .ThenInclude(x => x.SizeNavigation)
                                       .Include(x => x.ShoeCatalogNavigation)

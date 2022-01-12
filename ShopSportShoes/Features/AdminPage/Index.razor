@@ -9,7 +9,14 @@
 
     protected override void OnInitialized()
     {
-        NavigationManager.NavigateTo("/admin/product-management");
+        try
+        {
+            NavigationManager.NavigateTo("/admin/product-management");
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
         base.OnInitialized();
     }
 }

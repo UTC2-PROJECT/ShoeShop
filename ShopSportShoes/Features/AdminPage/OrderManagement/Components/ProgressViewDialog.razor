@@ -76,6 +76,7 @@
             };
             await OrderProgressRepository.AddAsync(progress);
             Order.OrderProgressesNavigation.Insert(0, progress);
+            _progressText = null;
         }
         else
         {
