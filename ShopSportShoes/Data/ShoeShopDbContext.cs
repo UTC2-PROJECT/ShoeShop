@@ -23,6 +23,18 @@ namespace ShopSportShoes.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //modelBuilder.Entity<ShoeCatalog>().HasData(new ShoeCatalog { Name = "Adidas"});
+            //modelBuilder.Entity<ShoeCatalog>().HasData(new ShoeCatalog { Name = "Nike"});
+            //modelBuilder.Entity<ShoeCatalog>().HasData(new ShoeCatalog { Name = "Mizuno"});
+            //modelBuilder.Entity<ShoeCatalog>().HasData(new ShoeCatalog { Name = "Puma"});
+
+            //modelBuilder.Entity<Size>().HasData(new ShoeCatalog { Name = "38" });
+            //modelBuilder.Entity<Size>().HasData(new ShoeCatalog { Name = "39" });
+            //modelBuilder.Entity<Size>().HasData(new ShoeCatalog { Name = "40" });
+            //modelBuilder.Entity<Size>().HasData(new ShoeCatalog { Name = "41" });
+            //modelBuilder.Entity<Size>().HasData(new ShoeCatalog { Name = "42" });
+            //modelBuilder.Entity<Size>().HasData(new ShoeCatalog { Name = "43" });
+
             modelBuilder.Entity<ShoeSize>().HasKey(sc => new { sc.Id});
             modelBuilder.Entity<ShoeSize>().Property(e => e.Id).UseIdentityColumn();
 
