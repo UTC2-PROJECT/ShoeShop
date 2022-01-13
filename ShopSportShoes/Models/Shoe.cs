@@ -13,6 +13,7 @@ namespace ShopSportShoes.Models
         {
             ShoeSizesNavigation = new();
             ImagesNavigation = new();
+            EvolutionNavigations = new();
         }
         public int Id { get; set; }
         public string Title { get; set; }
@@ -24,6 +25,7 @@ namespace ShopSportShoes.Models
         public ShoeCatalog ShoeCatalogNavigation { get; set; }
         public List<ShoeSize> ShoeSizesNavigation { get; set; }
         public List<Image> ImagesNavigation { get; set; }
+        public List<Evolution> EvolutionNavigations { get; set; }
     }
 
     public class Size

@@ -3,6 +3,9 @@
 @inject OrderRealtimeService OrderRealtimeService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@*@implements IDisposable*@
 
 <MudGrid>
     <MudItem xs="5">
@@ -78,10 +81,13 @@
                     <p>@((MarkupString)Shoe.Description)</p>
                 </MudContainer>
             </MudTabPanel>
+            <MudTabPanel Text="Đánh giá">
+                <MudContainer>
+                    <EvolutionTab Shoe="Shoe"/>
+                </MudContainer>
+            </MudTabPanel>
         </MudTabs>
     </MudItem>
-
-
 </MudGrid>
 
 <ImageOverlay @bind-IsOpen="_isOverlay" @bind-ImageSource="_imgSrcOveray" />
@@ -99,28 +105,42 @@
 
     int _quantity = 1;
 
+
     async Task<bool> AddToCart()
     {
         if (_chipSizeSeleted != null)
         {
-            OrderDetails orderDetails = new()
-            {
-                ShoeId = Shoe.Id,
-                IntoMoney = Shoe.Price * _quantity,
-                Quantity = _quantity,
-                Size = _chipSizeSeleted.Text
-            };
+            // Kiểm tra có đăng nhập thì mới thực hiện thêm giỏ hàng
 
-            if (UserCascaded.Id != 0)
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+            if (!authState.User.Identity.IsAuthenticated)
             {
-                orderDetails.UserId = UserCascaded.Id;
+                var returnUrl = "~/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+                NavigationManager.NavigateTo($"/Identity/Account/Login?returnUrl={returnUrl}", true);
+                return false;
             }
+            else
+            {
+                OrderDetails orderDetails = new()
+                {
+                    ShoeId = Shoe.Id,
+                    IntoMoney = Shoe.Price * _quantity,
+                    Quantity = _quantity,
+                    Size = _chipSizeSeleted.Text
+                };
 
-            await OrderDetailsRepository.AddAsync(orderDetails);
+                if (UserCascaded.Id != 0)
+                {
+                    orderDetails.UserId = UserCascaded.Id;
+                }
 
-            OrderRealtimeService.UpdateCart();
-            Snackbar.Add("Đã thêm vào giỏ hàng của bạn", Severity.Success);
-            return true;
+                await OrderDetailsRepository.AddAsync(orderDetails);
+
+                OrderRealtimeService.UpdateCart();
+                Snackbar.Add("Đã thêm vào giỏ hàng của bạn", Severity.Success);
+                return true;
+            }
         }
         else
         {
@@ -137,7 +157,7 @@
     async Task BuyNow()
     {
         var check = await AddToCart();
-        if(check)
+        if (check)
             NavigationManager.NavigateTo("/checkout");
     }
 }

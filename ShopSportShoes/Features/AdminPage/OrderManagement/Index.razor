@@ -1,6 +1,7 @@
 ﻿@page "/admin/order-management"
 
 @inject OrderRepository OrderRepository
+@inject OrderRealtimeService OrderRealtimeService
 @inject IDialogService DialogService
 
 @using ShopSportShoes.Features.AdminPage.OrderManagement.Components
@@ -125,6 +126,7 @@
     {
         order.State = state;
         OrderRepository.Update(order);
+        OrderRealtimeService.UpdateCart();
     }
 
     async Task HandleOrderCancel(Order order)
@@ -138,6 +140,7 @@
         {
             order.IsCanceled = true;
             OrderRepository.Update(order);
+            OrderRealtimeService.UpdateCart();
         }
     }
 

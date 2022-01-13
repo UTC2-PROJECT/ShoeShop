@@ -1,0 +1,78 @@
+﻿@inject EvolutionRepository EvolutionRepository
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudCard Class="pa-5">
+    <MudGrid>
+        <MudItem xs="12">
+            <div class="d-flex align-items-center mb-5">
+                <div class="d-flex align-items-start" style="position:relative; width:600px">
+                    <MudTextField FullWidth="true" T="string" @bind-Value="_evolution.Content" Variant="Variant.Outlined"
+                                  Label="Nhận xét của bạn" Margin="Margin.Dense" />
+                    <div style="position: absolute; top:100%; right:0;">
+                        <MudRating @bind-SelectedValue="_evolution.NumberOfStar" Class="ml-auto" />
+                    </div>
+                </div>
+                <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Success"
+                           OnClick="AddEvolution">Gửi</MudButton>
+            </div>
+        </MudItem>
+        <MudItem xs="12">
+            @if (Shoe != null)
+            {
+                @foreach (var item in Shoe.EvolutionNavigations)
+                {
+                    <div class="d-flex align-items-start">
+                        <div style="height:60px; width:60px; border-radius:100%; background:#808080">
+                            <img src="" style="width:100%; object-fit:contain;" />
+                        </div>
+                        <div class="d-flex flex-column ml-3"
+                             style="width:600px; position:relative;">
+                            <span>@item?.UserNavigation?.Name</span>
+                            <MudRating Size="MudBlazor.Size.Small" ReadOnly="true" DisableRipple="true" SelectedValue="item.NumberOfStar" />
+                            <p style="word-wrap:break-word;">@((MarkupString)item?.Content)</p>
+                        </div>
+                    </div>
+                    <MudDivider Class="mb-5"/>
+                }
+            }
+        </MudItem>
+    </MudGrid>
+</MudCard>
+
+@code {
+    [CascadingParameter(Name = "UserCascaded")] public User UserCascaded { get; set; }
+    [Parameter] public Shoe Shoe { get; set; }
+
+    Evolution _evolution = new();
+
+    async Task AddEvolution()
+    {
+        var authen = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (!authen.User.Identity.IsAuthenticated)
+        {
+            Snackbar.Add("Đăng nhập để tiếp tục", Severity.Info);
+            await Task.Delay(500);
+            var returnUrl = "~/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+            NavigationManager.NavigateTo($"/Identity/Account/Login?returnUrl={returnUrl}", true);
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(_evolution.Content) || _evolution.NumberOfStar >= 0)
+            {
+                _evolution.UserId = UserCascaded.Id;
+                _evolution.ShoeId = Shoe.Id;
+                await EvolutionRepository.AddAsync(_evolution);
+                _evolution.UserNavigation = new() { Name = UserCascaded.Name};
+                Shoe.EvolutionNavigations.Insert(0, _evolution);
+                _evolution = new();
+            }
+            else
+            {
+                Snackbar.Add("Thông tin không được trống", Severity.Info);
+            }
+        }
+    }
+
+}

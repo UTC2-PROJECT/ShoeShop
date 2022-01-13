@@ -44,6 +44,8 @@ namespace ShopSportShoes.Repositories
 
             return await context.Shoes.Where(x => x.Id == id)
                                     .Include(x => x.ImagesNavigation)
+                                    .Include(x => x.EvolutionNavigations)
+                                        .ThenInclude(x => x.UserNavigation)
                                     .Include(x => x.ShoeCatalogNavigation)
                                     .Include(x => x.ShoeSizesNavigation)
                                         .ThenInclude(x => x.SizeNavigation)

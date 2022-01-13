@@ -2,6 +2,8 @@
 
 @inject OrderRepository OrderRepository
 @inject NavigationManager NavigationManager
+@inject OrderRealtimeService OrderRealtimeService
+@implements IDisposable
 
 <MudCard Class="overflow-hidden" Elevation="25">
     <MudGrid>
@@ -103,7 +105,19 @@
     protected override void OnInitialized()
     {
         _order = OrderRepository.GetById(OrderId);
+        OrderRealtimeService.Func += HandleOrdersUpdate;
         base.OnInitialized();
+    }
+
+    async Task HandleOrdersUpdate()
+    {
+        _order = OrderRepository.GetById(OrderId);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    void IDisposable.Dispose()
+    {
+        OrderRealtimeService.Func -= HandleOrdersUpdate;
     }
 
     protected override void OnParametersSet()

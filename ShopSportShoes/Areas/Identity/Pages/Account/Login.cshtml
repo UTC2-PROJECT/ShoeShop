@@ -2,7 +2,7 @@
 @model LoginModel
 
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = "Đăng nhập";
 }
 
 <div class="container-fluid w-full bg-dark vh-100" id="Authentication">
@@ -31,6 +31,7 @@
                                         @Html.DisplayNameFor(m => m.Input.RememberMe)
                                     </label>
                                 </div>
+
                             </div>
                             <div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
                                 <button type="submit" class="btn" style="background: #b90b0b; color:white; border:none">Login</button>
@@ -38,6 +39,8 @@
                             </div>
                         </form>
                     </section>
+                    <a href="/Identity/Account/Register"
+                       class="text-center m-auto d-block">Chưa có tài khoản?Đăng ký</a>
                 </div>
 
             </div>

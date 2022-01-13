@@ -11,7 +11,7 @@ namespace ShopSportShoes.Models
         public User()
         {
             Roles = new();
-            EvolutionsNavigation = new();
+            EvolutionNavigations = new();
             OrdersNavigation = new();
         }
         public int Id { get; set; }
@@ -20,7 +20,7 @@ namespace ShopSportShoes.Models
         public DateTime DateOfBirth { get; set; }
         public bool IsAdmin { get; set; }
         public List<Order> OrdersNavigation { get; set; }
-        public List<Evolution> EvolutionsNavigation { get; set; }
+        public List<Evolution> EvolutionNavigations { get; set; }
         public List<OrderDetails> OrdersDetailsNavigation { get; set; }
 
         [NotMapped]

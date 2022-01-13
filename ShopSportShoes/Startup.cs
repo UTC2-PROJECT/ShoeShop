@@ -79,7 +79,7 @@ namespace ShopSportShoes
             services.AddScoped<UserManagerService>();
 
             // Realtime service
-            services.AddScoped<OrderRealtimeService>();
+            services.AddSingleton<OrderRealtimeService>();
 
             // Repository
             services.AddSingleton<ShoeRepository>();
@@ -92,6 +92,7 @@ namespace ShopSportShoes
             services.AddSingleton<OrderDetailsRepository>();
             services.AddSingleton<OrderProgressRepository>();
             services.AddSingleton<ImageFileService>();
+            services.AddSingleton<EvolutionRepository>();
 
 
 
