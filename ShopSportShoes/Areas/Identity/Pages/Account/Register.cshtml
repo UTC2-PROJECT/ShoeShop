@@ -1,12 +1,13 @@
 ﻿@page
 @model RegisterModel
+
+@{
+    ViewData["Title"] = "Đăng ký";
+}
 <div class="container-fluid w-full bg-danger" id="Authentication">
     <div class="row justify-content-center align-items-center vh-100">
         <div class="col-lg-4">
             <div class="card shadow-lg border-0 rounded-lg">
-                @*<div class="card-header">
-                    <img src="~/images/logos/logo.jpg" class="img-fluid" width="250" style="display: block; margin-left: auto; margin-right: auto;" alt="logo">
-                </div>*@
                 <div class="card-body">
                     <section>
                         <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
